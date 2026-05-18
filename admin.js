@@ -1,20 +1,66 @@
-// ── Data helpers ────────────────────────────────────────────────────────────
+// ── Auth guard ──────────────────────────────────────────────────────────────
 
-function getOrders() {
-  try { return JSON.parse(localStorage.getItem("brood_orders")) || []; } catch { return []; }
+const adminLogin = document.getElementById("admin-login");
+const adminMain = document.getElementById("admin-main");
+
+function showAdmin() {
+  adminLogin.style.display = "none";
+  adminMain.style.display = "block";
+  initAdmin();
 }
 
-function setOrders(orders) {
-  localStorage.setItem("brood_orders", JSON.stringify(orders));
+function showLogin(msg) {
+  adminLogin.style.display = "grid";
+  adminMain.style.display = "none";
+  if (msg) document.getElementById("admin-auth-error").textContent = msg;
 }
 
-function getLimits() {
-  try { return JSON.parse(localStorage.getItem("brood_limits")); } catch {}
-  return { maxPerDay: 50, items: {} };
+document.getElementById("admin-login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("admin-email").value.trim();
+  const pw = document.getElementById("admin-password").value;
+  document.getElementById("admin-auth-error").textContent = "";
+  if (typeof logIn !== "function") {
+    document.getElementById("admin-auth-error").textContent = "Firebase not configured. See firebase.js.";
+    return;
+  }
+  try {
+    await logIn(email, pw);
+  } catch (err) {
+    document.getElementById("admin-auth-error").textContent = err.message || "Sign in failed";
+  }
+});
+
+if (typeof onAuthChanged === "function") {
+  onAuthChanged((user) => {
+    if (user) showAdmin(); else showLogin();
+  });
+} else {
+  showLogin("Firebase not loaded. Configure firebase.js first.");
 }
 
-function setLimits(limits) {
-  localStorage.setItem("brood_limits", JSON.stringify(limits));
+// ── Admin dashboard (Firestore) ─────────────────────────────────────────────
+
+let allOrders = [];
+let unsubOrders = null;
+let unsubLimits = null;
+
+function initAdmin() {
+  if (typeof listenOrders === "function") {
+    if (unsubOrders) unsubOrders();
+    unsubOrders = listenOrders((orders) => {
+      allOrders = orders;
+      renderOrders();
+    });
+  }
+
+  if (typeof listenLimits === "function") {
+    if (unsubLimits) unsubLimits();
+    unsubLimits = listenLimits((limits) => {
+      document.getElementById("limit-perday").value = limits.maxPerDay || 50;
+      renderLimitItems(limits);
+    });
+  }
 }
 
 // ── Render orders ───────────────────────────────────────────────────────────
@@ -23,12 +69,11 @@ const statusFilter = document.getElementById("order-filter-status");
 const dateFilter = document.getElementById("order-filter-date");
 
 function renderOrders() {
-  const orders = getOrders();
   const list = document.getElementById("orders-list");
   const status = statusFilter.value;
   const date = dateFilter.value;
 
-  const filtered = orders.filter((o) => {
+  const filtered = allOrders.filter((o) => {
     if (status !== "all" && o.status !== status) return false;
     if (date && o.date !== date) return false;
     return true;
@@ -39,70 +84,60 @@ function renderOrders() {
     return;
   }
 
-  list.innerHTML = filtered.map((o, i) => {
-    const idx = orders.findIndex((x) => x.id === o.id);
-    const itemsHtml = o.items.map((item) =>
+  list.innerHTML = filtered.map((o) => {
+    const itemsHtml = (o.items || []).map((item) =>
       `<div><span>${item.qty}×</span> ${item.name}${item.type ? " (" + item.type + ")" : ""}</div>`
     ).join("");
 
     return `
-      <div class="order-card" data-idx="${idx}">
+      <div class="order-card" data-id="${o.id}">
         <div class="order-card-header">
           <div>
             <span class="order-card-date">${o.date}</span>
-            <span class="order-card-id">#${o.id.slice(-6)}</span>
+            <span class="order-card-id">#${o.id ? o.id.slice(-6) : "---"}</span>
           </div>
           <div>
             <span class="order-card-status ${o.status}">${o.status}</span>
             ${o.time ? `<span style="margin-left:0.5rem;font-size:0.85rem;color:var(--muted)">${o.time}</span>` : ""}
           </div>
         </div>
-        <div class="order-card-contact">${o.customerName} — ${o.customerContact}</div>
+        <div class="order-card-contact">${o.customerName || "?"} — ${o.customerContact || "?"}</div>
         <div class="order-card-items">${itemsHtml}</div>
-        <div style="font-weight:700;color:var(--brood-blue)">$${o.total.toFixed(2)}</div>
+        <div style="font-weight:700;color:var(--brood-blue)">$${(o.total || 0).toFixed(2)}</div>
         ${o.notes ? `<div class="order-card-notes">${escapeHtml(o.notes)}</div>` : ""}
         <div class="order-card-actions">
-          ${o.status !== "confirmed" ? `<button class="btn-confirm" data-action="confirm">Confirm</button>` : ""}
-          ${o.status !== "declined" ? `<button class="btn-decline" data-action="decline">Decline</button>` : ""}
-          <button class="btn-delete" data-action="delete">Delete</button>
+          ${o.status !== "confirmed" ? `<button class="btn-confirm" data-id="${o.id}">Confirm</button>` : ""}
+          ${o.status !== "declined" ? `<button class="btn-decline" data-id="${o.id}">Decline</button>` : ""}
+          <button class="btn-delete" data-id="${o.id}">Delete</button>
         </div>
       </div>
     `;
   }).join("");
 
-  list.querySelectorAll(".btn-confirm").forEach((btn) => {
+  document.querySelectorAll(".btn-confirm").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const card = btn.closest(".order-card");
-      const idx = parseInt(card.dataset.idx, 10);
-      const orders = getOrders();
-      orders[idx].status = "confirmed";
-      setOrders(orders);
-      renderOrders();
-      showToast("Order confirmed");
+      if (typeof updateOrderStatus === "function") {
+        updateOrderStatus(btn.dataset.id, "confirmed");
+        showToast("Order confirmed");
+      }
     });
   });
 
-  list.querySelectorAll(".btn-decline").forEach((btn) => {
+  document.querySelectorAll(".btn-decline").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const card = btn.closest(".order-card");
-      const idx = parseInt(card.dataset.idx, 10);
-      const orders = getOrders();
-      orders[idx].status = "declined";
-      setOrders(orders);
-      renderOrders();
-      showToast("Order declined");
+      if (typeof updateOrderStatus === "function") {
+        updateOrderStatus(btn.dataset.id, "declined");
+        showToast("Order declined");
+      }
     });
   });
 
-  list.querySelectorAll(".btn-delete").forEach((btn) => {
+  document.querySelectorAll(".btn-delete").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const card = btn.closest(".order-card");
-      const idx = parseInt(card.dataset.idx, 10);
-      const orders = getOrders();
-      orders.splice(idx, 1);
-      setOrders(orders);
-      renderOrders();
-      showToast("Order deleted");
+      if (typeof deleteOrder === "function") {
+        deleteOrder(btn.dataset.id);
+        showToast("Order deleted");
+      }
     });
   });
 }
@@ -116,7 +151,7 @@ function escapeHtml(s) {
 statusFilter.addEventListener("change", renderOrders);
 dateFilter.addEventListener("change", renderOrders);
 
-// ── Limits tab ──────────────────────────────────────────────────────────────
+// ── Limits ──────────────────────────────────────────────────────────────────
 
 const menuItems = [
   "Shio pans", "Croissants", "Pain au chocolat", "Focaccias",
@@ -125,13 +160,10 @@ const menuItems = [
   "Cinnamon rolls and donuts", "Brioche loafs or buns"
 ];
 
-function renderLimits() {
-  const limits = getLimits();
-  document.getElementById("limit-perday").value = limits.maxPerDay || 50;
-
+function renderLimitItems(limits) {
   const container = document.getElementById("limit-items");
   container.innerHTML = menuItems.map((name) => {
-    const val = (limits.items[name] && limits.items[name].max) || "";
+    const val = (limits.items && limits.items[name] && limits.items[name].max) || "";
     return `
       <div class="limit-item-row">
         <span>${name}</span>
@@ -141,42 +173,18 @@ function renderLimits() {
   }).join("");
 }
 
-document.getElementById("limit-perday").addEventListener("change", () => {
-  const val = parseInt(document.getElementById("limit-perday").value, 10);
-  if (val > 0) {
-    const limits = getLimits();
-    limits.maxPerDay = val;
-    setLimits(limits);
-  }
-});
-
-document.addEventListener("change", (e) => {
-  if (e.target.classList.contains("limit-item-input")) {
-    const name = e.target.dataset.name;
-    const val = parseInt(e.target.value, 10);
-    const limits = getLimits();
-    if (val > 0) {
-      limits.items[name] = { max: val };
-    } else {
-      delete limits.items[name];
-    }
-    setLimits(limits);
-  }
-});
-
 document.querySelector(".admin-save-limits").addEventListener("click", () => {
   const maxPerDay = parseInt(document.getElementById("limit-perday").value, 10) || 50;
-  const limits = { maxPerDay, items: {} };
-
+  const items = {};
   document.querySelectorAll(".limit-item-input").forEach((input) => {
     const val = parseInt(input.value, 10);
-    if (val > 0) {
-      limits.items[input.dataset.name] = { max: val };
-    }
+    if (val > 0) items[input.dataset.name] = { max: val };
   });
 
-  setLimits(limits);
-  showToast("Limits saved");
+  if (typeof saveLimits === "function") {
+    saveLimits({ maxPerDay, items });
+    showToast("Limits saved");
+  }
 });
 
 // ── Tab switching ───────────────────────────────────────────────────────────
@@ -208,8 +216,3 @@ function showToast(msg) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => el.classList.remove("is-visible"), 2000);
 }
-
-// ── Init ────────────────────────────────────────────────────────────────────
-
-renderOrders();
-renderLimits();

@@ -364,3 +364,61 @@ body {
 .admin-toast.is-visible {
   opacity: 1;
 }
+
+/* ── Admin login ─────────────────────── */
+
+.admin-login {
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  padding: 2rem 1rem;
+}
+
+.admin-login-form {
+  width: min(100%, 360px);
+  border: 2px solid var(--brood-blue);
+  padding: 2rem 1.5rem;
+  background: var(--paper);
+}
+
+.admin-login-form h2 {
+  margin: 0 0 1.25rem;
+  font-size: 1.4rem;
+  font-weight: 850;
+  color: var(--brood-blue);
+  text-align: center;
+}
+
+.admin-login-form input {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--ink);
+  border: 2px solid var(--line);
+  margin-bottom: 0.75rem;
+  box-sizing: border-box;
+}
+
+.admin-login-form input:focus {
+  outline: 2px solid var(--brood-blue);
+  outline-offset: 1px;
+}
+
+.admin-login-form button {
+  width: 100%;
+  padding: 0.7rem;
+  font-size: 1rem;
+  font-weight: 800;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--paper);
+  background: var(--brood-blue);
+  border: 0;
+  cursor: pointer;
+}
+
+.admin-login-form button:hover {
+  background: var(--brood-blue-dark);
+}

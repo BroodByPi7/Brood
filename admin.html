@@ -6,6 +6,10 @@
   <title>Brood — Admin</title>
   <meta name="robots" content="noindex">
   <link rel="stylesheet" href="admin.css">
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script defer src="firebase.js"></script>
   <script defer src="admin.js"></script>
 </head>
 <body>
@@ -19,7 +23,17 @@
     </div>
   </header>
 
-  <main class="admin-main">
+  <div class="admin-login" id="admin-login">
+    <form class="admin-login-form" id="admin-login-form">
+      <h2>Admin sign in</h2>
+      <input type="email" id="admin-email" placeholder="Email" required>
+      <input type="password" id="admin-password" placeholder="Password" required>
+      <button type="submit">Sign in</button>
+      <p class="auth-error" id="admin-auth-error"></p>
+    </form>
+  </div>
+
+  <main class="admin-main" id="admin-main" style="display:none">
     <!-- Orders tab -->
     <section class="admin-tab is-active" id="tab-orders">
       <div class="admin-tab-head">

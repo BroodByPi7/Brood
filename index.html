@@ -7,6 +7,10 @@
   <meta name="description" content="Brood is an artisanal sourdough bakery with daily shio pans, croissants, focaccias, sourdoughs, shoku pans, baguettes, and preorder cakes, pies, viennoiseries, cookies, rolls, donuts, and brioche.">
   <meta name="theme-color" content="#073f9e">
   <link rel="stylesheet" href="styles.css">
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script defer src="firebase.js"></script>
   <script defer src="script.js"></script>
 </head>
 <body>
@@ -28,6 +32,7 @@
       <a href="#pickup">Pickup</a>
       <a href="#catering">Catering</a>
       <a href="#about">About</a>
+      <button class="nav-auth-btn" type="button" id="nav-auth-btn" style="background:none;border:none;color:var(--brood-blue);font:inherit;font-size:0.85rem;font-weight:700;cursor:pointer;padding:0.72rem 0.8rem;text-transform:uppercase;letter-spacing:0.06em;">Sign in</button>
       <a href="admin.html" class="admin-link" style="opacity:0.3;font-size:0.7rem;">Admin</a>
     </nav>
   </header>
@@ -311,5 +316,42 @@
     </span>
     <span class="basket-count">0</span>
   </button>
+
+  <div class="auth-modal" id="auth-modal" role="dialog" aria-label="Sign in or create account">
+    <div class="auth-backdrop"></div>
+    <div class="auth-content">
+      <button class="auth-close" type="button" aria-label="Close">&times;</button>
+      <div class="auth-tabs">
+        <button class="auth-tab is-active" data-tab="login">Sign in</button>
+        <button class="auth-tab" data-tab="signup">Create account</button>
+      </div>
+      <form class="auth-form" id="auth-form">
+        <div class="auth-fields" id="auth-fields-login">
+          <input type="email" id="auth-email" placeholder="Email" required>
+          <input type="password" id="auth-password" placeholder="Password" required>
+        </div>
+        <div class="auth-fields" id="auth-fields-signup" style="display:none">
+          <input type="text" id="auth-name" placeholder="Your name" required>
+          <input type="email" id="auth-email2" placeholder="Email" required>
+          <input type="password" id="auth-password2" placeholder="Password (min 6 chars)" required>
+        </div>
+        <button class="auth-submit" type="submit">Sign in</button>
+        <p class="auth-error" id="auth-error"></p>
+      </form>
+    </div>
+  </div>
+
+  <div class="account-panel" id="account-panel" role="dialog" aria-label="Your account">
+    <div class="account-backdrop"></div>
+    <div class="account-content">
+      <button class="account-close" type="button" aria-label="Close">&times;</button>
+      <h3>Your account</h3>
+      <p class="account-name" id="account-name"></p>
+      <div class="account-orders" id="account-orders">
+        <p style="color:var(--muted);font-size:0.9rem;">Loading your orders...</p>
+      </div>
+      <button class="account-signout" type="button">Sign out</button>
+    </div>
+  </div>
 </body>
 </html>

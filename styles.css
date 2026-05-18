@@ -1159,3 +1159,253 @@ p {
 .admin-link:hover {
   opacity: 1;
 }
+
+.nav-auth-btn {
+  font-size: 0.72rem !important;
+}
+
+/* ── Auth modal ──────────────────────── */
+
+.auth-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms;
+}
+
+.auth-modal.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.auth-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.auth-content {
+  position: relative;
+  width: min(100%, 380px);
+  background: var(--paper);
+  border: 2px solid var(--brood-blue);
+  padding: 2rem 1.5rem 1.5rem;
+}
+
+.auth-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--brood-blue);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--brood-blue);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.25rem;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--muted);
+  background: var(--paper-warm);
+  border: 2px solid var(--line);
+  cursor: pointer;
+}
+
+.auth-tab.is-active {
+  color: var(--paper);
+  background: var(--brood-blue);
+  border-color: var(--brood-blue);
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--ink);
+  border: 2px solid var(--line);
+  margin-bottom: 0.75rem;
+  box-sizing: border-box;
+}
+
+.auth-form input:focus {
+  outline: 2px solid var(--brood-blue);
+  outline-offset: 1px;
+}
+
+.auth-submit {
+  width: 100%;
+  padding: 0.7rem;
+  font-size: 1rem;
+  font-weight: 800;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--paper);
+  background: var(--brood-blue);
+  border: 0;
+  cursor: pointer;
+}
+
+.auth-submit:hover {
+  background: var(--brood-blue-dark);
+}
+
+.auth-error {
+  color: #c42b2b;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  min-height: 1.2rem;
+}
+
+/* ── Account panel ───────────────────── */
+
+.account-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  justify-items: end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms;
+}
+
+.account-panel.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.account-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.account-content {
+  position: relative;
+  width: min(100%, 380px);
+  height: 100%;
+  background: var(--paper);
+  border-left: 2px solid var(--brood-blue);
+  padding: 2rem 1.25rem 1.25rem;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 250ms;
+}
+
+.account-panel.is-open .account-content {
+  transform: translateX(0);
+}
+
+.account-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--brood-blue);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--brood-blue);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.account-content h3 {
+  margin-bottom: 0.3rem;
+}
+
+.account-name {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.account-orders {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.account-order {
+  border: 2px solid var(--line);
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+}
+
+.account-order-date {
+  font-weight: 700;
+  color: var(--brood-blue);
+}
+
+.account-order-status {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-left: 0.5rem;
+}
+
+.account-order-status.pending { color: var(--amber); }
+.account-order-status.confirmed { color: var(--green); }
+.account-order-status.declined { color: var(--red); }
+
+.account-order-total {
+  font-weight: 700;
+  margin-top: 0.3rem;
+}
+
+.account-order-reorder {
+  margin-top: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--brood-blue);
+  border: 2px solid var(--brood-blue);
+  background: var(--paper);
+  cursor: pointer;
+}
+
+.account-order-reorder:hover {
+  background: var(--brood-blue-soft);
+}
+
+.account-signout {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--muted);
+  border: 2px solid var(--line);
+  background: transparent;
+  cursor: pointer;
+}
+
+.account-signout:hover {
+  background: var(--paper-warm);
+}

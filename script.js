@@ -500,3 +500,213 @@ if (orderForm) {
 function setOrders(orders) {
   localStorage.setItem("brood_orders", JSON.stringify(orders));
 }
+
+// ── Auth UI ─────────────────────────────────────────────────────────────────
+
+const authModal = document.getElementById("auth-modal");
+const navAuthBtn = document.getElementById("nav-auth-btn");
+const accountPanel = document.getElementById("account-panel");
+let currentTab = "login";
+
+function openAuthModal() {
+  authModal.classList.add("is-open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeAuthModal() {
+  authModal.classList.remove("is-open");
+  document.body.style.overflow = "";
+}
+
+authModal.querySelector(".auth-backdrop").addEventListener("click", closeAuthModal);
+authModal.querySelector(".auth-close").addEventListener("click", closeAuthModal);
+
+navAuthBtn.addEventListener("click", openAuthModal);
+
+document.querySelectorAll(".auth-tab").forEach((tab) => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".auth-tab").forEach((t) => t.classList.remove("is-active"));
+    tab.classList.add("is-active");
+    currentTab = tab.dataset.tab;
+    document.getElementById("auth-fields-login").style.display = currentTab === "login" ? "" : "none";
+    document.getElementById("auth-fields-signup").style.display = currentTab === "signup" ? "" : "none";
+    document.querySelector(".auth-submit").textContent = currentTab === "login" ? "Sign in" : "Create account";
+    document.getElementById("auth-error").textContent = "";
+  });
+});
+
+document.getElementById("auth-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const errorEl = document.getElementById("auth-error");
+  errorEl.textContent = "";
+
+  if (currentTab === "login") {
+    const email = document.getElementById("auth-email").value.trim();
+    const pw = document.getElementById("auth-password").value;
+    if (typeof logIn !== "function") { errorEl.textContent = "Firebase not configured. See firebase.js to set up."; return; }
+    try {
+      await logIn(email, pw);
+      closeAuthModal();
+      document.getElementById("auth-email").value = "";
+      document.getElementById("auth-password").value = "";
+    } catch (err) {
+      errorEl.textContent = err.message || "Sign in failed";
+    }
+  } else {
+    const name = document.getElementById("auth-name").value.trim();
+    const email = document.getElementById("auth-email2").value.trim();
+    const pw = document.getElementById("auth-password2").value;
+    if (typeof signUp !== "function") { errorEl.textContent = "Firebase not configured. See firebase.js to set up."; return; }
+    try {
+      const cred = await signUp(email, pw, name);
+      await setUserProfile(cred.user.uid, { email, name, memberSince: new Date().toISOString() });
+      closeAuthModal();
+      document.getElementById("auth-name").value = "";
+      document.getElementById("auth-email2").value = "";
+      document.getElementById("auth-password2").value = "";
+    } catch (err) {
+      errorEl.textContent = err.message || "Sign up failed";
+    }
+  }
+});
+
+// ── Auth state ──────────────────────────────────────────────────────────────
+
+if (typeof onAuthChanged === "function") {
+  onAuthChanged((user) => {
+    if (user) {
+      navAuthBtn.textContent = "My account";
+      navAuthBtn.onclick = () => {
+        accountPanel.classList.add("is-open");
+        document.body.style.overflow = "hidden";
+        loadUserOrders(user.uid);
+      };
+      getUserProfile(user.uid).then((profile) => {
+        document.getElementById("account-name").textContent = profile ? profile.name : user.email;
+      });
+    } else {
+      navAuthBtn.textContent = "Sign in";
+      navAuthBtn.onclick = openAuthModal;
+    }
+  });
+}
+
+accountPanel.querySelector(".account-backdrop").addEventListener("click", () => {
+  accountPanel.classList.remove("is-open");
+  document.body.style.overflow = "";
+});
+
+accountPanel.querySelector(".account-close").addEventListener("click", () => {
+  accountPanel.classList.remove("is-open");
+  document.body.style.overflow = "";
+});
+
+accountPanel.querySelector(".account-signout").addEventListener("click", () => {
+  if (typeof logOut === "function") logOut();
+  accountPanel.classList.remove("is-open");
+  document.body.style.overflow = "";
+});
+
+async function loadUserOrders(uid) {
+  const container = document.getElementById("account-orders");
+  if (typeof getUserOrders === "function") {
+    getUserOrders(uid, (orders) => {
+      if (orders.length === 0) {
+        container.innerHTML = '<p style="color:var(--muted);font-size:0.9rem;">No orders yet.</p>';
+        return;
+      }
+      container.innerHTML = orders.map((o) => {
+        const items = o.items.map((i) => `${i.qty}× ${i.name}${i.type ? " (" + i.type + ")" : ""}`).join(", ");
+        return `
+          <div class="account-order">
+            <div>
+              <span class="account-order-date">${o.date}</span>
+              <span class="account-order-status ${o.status}">${o.status}</span>
+            </div>
+            <div style="margin-top:0.3rem">${items}</div>
+            <div class="account-order-total">$${o.total.toFixed(2)}</div>
+            <button class="account-order-reorder" data-order-id="${o.id}" data-items='${JSON.stringify(o.items).replace(/'/g, "&#39;")}'>Reorder</button>
+          </div>
+        `;
+      }).join("");
+
+      container.querySelectorAll(".account-order-reorder").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          try {
+            const items = JSON.parse(btn.dataset.items);
+            items.forEach((item) => {
+              basket.push({ name: item.name, type: item.type || "", qty: item.qty || 1, price: item.price || 0 });
+            });
+            renderBasket();
+            accountPanel.classList.remove("is-open");
+            document.body.style.overflow = "";
+            openBasket();
+          } catch (e) {}
+        });
+      });
+    });
+  } else {
+    container.innerHTML = '<p style="color:var(--muted);font-size:0.9rem;">Sign in to see your orders.</p>';
+  }
+}
+
+// ── Use Firestore for order submission when available ───────────────────────
+
+const origSubmitHandler = orderForm ? orderForm.submit : null;
+
+if (orderForm && typeof placeOrder === "function") {
+  const origListener = orderForm._listeners ? orderForm._listeners[0] : null;
+  // Wrap the submit to try Firestore first
+  const origSubmit = orderForm.addEventListener;
+  orderForm.addEventListener("submit", async (e) => {
+    // Only intercept if Firebase is ready
+    if (typeof placeOrder !== "function" || !currentUser()) return;
+
+    const user = currentUser();
+    if (!user) return;
+
+    e.preventDefault();
+    const name = document.getElementById("order-name").value.trim();
+    const contact = document.getElementById("order-contact").value.trim();
+    const notes = document.getElementById("order-notes").value.trim();
+    const date = pickupDate ? pickupDate.value : "";
+    const slot = document.querySelector(".slot-btn.is-selected");
+    const time = slot ? slot.dataset.time : "";
+
+    if (!name || !contact) return;
+    if (basket.length === 0) { alert("Your basket is empty."); return; }
+    if (isDateFull(date)) { alert("This date is fully booked."); return; }
+
+    const total = basket.reduce((s, i) => s + i.qty * i.price, 0);
+    try {
+      await placeOrder({
+        customerId: user.uid,
+        customerName: name,
+        customerContact: contact,
+        date, time, notes,
+        items: basket.map((i) => ({ name: i.name, type: i.type || "", qty: i.qty, price: i.price })),
+        total,
+        status: "pending",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      basket.length = 0;
+      renderBasket();
+      orderForm.reset();
+      pickupDate.value = document.querySelector(".cal-day.is-selected")
+        ? document.querySelector(".cal-day.is-selected").dataset.date
+        : (() => { const d = new Date(); d.setDate(d.getDate() + 1); return fmtDate(d.getFullYear(), d.getMonth(), d.getDate()); })();
+
+      const existing = document.querySelector(".order-confirmation");
+      if (existing) existing.remove();
+      const confirm = document.createElement("div");
+      confirm.className = "order-confirmation";
+      confirm.innerHTML = `<p><strong>Order sent!</strong> We'll confirm your pickup time.</p>`;
+      orderForm.parentNode.insertBefore(confirm, orderForm);
+      renderCalendar();
+      updateBasketLimits();
+    } catch (err) {
+      alert("Order failed: " + err.message);
+    }
+  }, true);
+}
