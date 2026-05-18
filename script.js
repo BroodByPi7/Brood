@@ -55,7 +55,7 @@ document.addEventListener("click", (event) => {
   }
 });
 
-{
+(function() {
   const slideshow = document.querySelector(".menu-slideshow");
   const images = [...document.querySelectorAll(".menu-card .card-img img")].map(i => i.src);
   if (!slideshow || images.length === 0) return;
@@ -76,7 +76,7 @@ document.addEventListener("click", (event) => {
     current = (current + 1) % slides.length;
     slides[current].classList.add("is-active");
   }, 5000);
-}
+})();
 
 const basket = [];
 const basketSidebar = document.querySelector(".basket-sidebar");
