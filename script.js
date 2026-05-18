@@ -281,10 +281,10 @@ document.querySelectorAll(".menu-card").forEach((card) => {
 
 const pickupDate = document.getElementById("pickup-date");
 const calendar = document.getElementById("calendar-widget");
-const calGrid = calendar.querySelector(".cal-grid");
-const calLabel = calendar.querySelector(".cal-label");
+const calGrid = calendar ? calendar.querySelector(".cal-grid") : null;
+const calLabel = calendar ? calendar.querySelector(".cal-label") : null;
 
-{
+if (pickupDate) {
   const d = new Date();
   d.setDate(d.getDate() + 1);
   pickupDate.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -307,7 +307,10 @@ document.querySelectorAll(".slot-btn").forEach((btn) => {
 // ── Order storage and limits ────────────────────────────────────────────────
 
 function getOrders() {
-  try { return JSON.parse(localStorage.getItem("brood_orders")) || []; } catch { return []; }
+  try {
+    const val = JSON.parse(localStorage.getItem("brood_orders"));
+    return Array.isArray(val) ? val : [];
+  } catch { return []; }
 }
 
 function getLimits() {
@@ -346,63 +349,70 @@ function isItemSoldOut(date, itemName) {
 
 // ── Calendar with availability ──────────────────────────────────────────────
 function renderCalendar() {
-  const year = calMonth.getFullYear();
-  const month = calMonth.getMonth();
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (!calGrid || !calLabel || !pickupDate) return;
+  try {
+    const year = calMonth.getFullYear();
+    const month = calMonth.getMonth();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const first = new Date(year, month, 1);
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const prevDays = new Date(year, month, 0).getDate();
-  const startOff = first.getDay() === 0 ? 6 : first.getDay() - 1;
+    const first = new Date(year, month, 1);
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const prevDays = new Date(year, month, 0).getDate();
+    const startOff = first.getDay() === 0 ? 6 : first.getDay() - 1;
 
-  calLabel.textContent = first.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    calLabel.textContent = first.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
-  let html = "";
+    let html = "";
 
-  for (let i = startOff - 1; i >= 0; i--) {
-    const d = prevDays - i;
-    html += `<div class="cal-day is-other" data-date="${fmtDate(year, month - 1, d)}">${d}</div>`;
+    for (let i = startOff - 1; i >= 0; i--) {
+      const d = prevDays - i;
+      html += `<div class="cal-day is-other" data-date="${fmtDate(year, month - 1, d)}">${d}</div>`;
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(year, month, d);
+      const ds = fmtDate(year, month, d);
+      let cls = "cal-day";
+      if (date < tomorrow) cls += " is-past";
+      if (date.toDateString() === today.toDateString()) cls += " is-today";
+      if (ds === pickupDate.value) cls += " is-selected";
+      if (isDateFull(ds)) cls += " is-full";
+      html += `<div class="${cls}" data-date="${ds}">${d}</div>`;
+    }
+
+    const total = startOff + daysInMonth;
+    for (let d = 1; d <= (7 - total % 7) % 7; d++) {
+      html += `<div class="cal-day is-other" data-date="${fmtDate(year, month + 1, d)}">${d}</div>`;
+    }
+
+    calGrid.innerHTML = html;
+
+    calGrid.querySelectorAll(".cal-day:not(.is-past):not(.is-other):not(.is-full)").forEach((day) => {
+      day.addEventListener("click", () => {
+        calGrid.querySelectorAll(".cal-day").forEach((d) => d.classList.remove("is-selected"));
+        day.classList.add("is-selected");
+        pickupDate.value = day.dataset.date;
+        updateBasketLimits();
+      });
+    });
+  } catch (e) {
+    console.warn("Calendar render error:", e);
   }
+}
 
-  for (let d = 1; d <= daysInMonth; d++) {
-    const date = new Date(year, month, d);
-    const ds = fmtDate(year, month, d);
-    let cls = "cal-day";
-    if (date < tomorrow) cls += " is-past";
-    if (date.toDateString() === today.toDateString()) cls += " is-today";
-    if (ds === pickupDate.value) cls += " is-selected";
-    if (isDateFull(ds)) cls += " is-full";
-    html += `<div class="${cls}" data-date="${ds}">${d}</div>`;
-  }
+if (calendar) renderCalendar();
 
-  const total = startOff + daysInMonth;
-  for (let d = 1; d <= (7 - total % 7) % 7; d++) {
-    html += `<div class="cal-day is-other" data-date="${fmtDate(year, month + 1, d)}">${d}</div>`;
-  }
-
-  calGrid.innerHTML = html;
-
-  calGrid.querySelectorAll(".cal-day:not(.is-past):not(.is-other):not(.is-full)").forEach((day) => {
-    day.addEventListener("click", () => {
-      calGrid.querySelectorAll(".cal-day").forEach((d) => d.classList.remove("is-selected"));
-      day.classList.add("is-selected");
-      pickupDate.value = day.dataset.date;
-      updateBasketLimits();
+if (calendar) {
+  document.querySelectorAll(".cal-prev, .cal-next").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      calMonth.setMonth(calMonth.getMonth() + (btn.classList.contains("cal-next") ? 1 : -1));
+      renderCalendar();
     });
   });
 }
-
-renderCalendar();
-
-document.querySelectorAll(".cal-prev, .cal-next").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    calMonth.setMonth(calMonth.getMonth() + (btn.classList.contains("cal-next") ? 1 : -1));
-    renderCalendar();
-  });
-});
 
 // ── Basket limit warnings ──────────────────────────────────────────────────
 
@@ -426,9 +436,36 @@ function updateBasketLimits() {
 
 // ── Form submission ─────────────────────────────────────────────────────────
 
+function setOrders(orders) {
+  localStorage.setItem("brood_orders", JSON.stringify(orders));
+}
+
+function showOrderConfirmation(ref) {
+  const existing = document.querySelector(".order-confirmation");
+  if (existing) existing.remove();
+  const confirm = document.createElement("div");
+  confirm.className = "order-confirmation";
+  confirm.innerHTML = ref
+    ? `<p><strong>Order sent!</strong> We'll confirm your pickup time.</p><p class="order-confirm-ref">Reference: #${ref}</p>`
+    : `<p><strong>Order sent!</strong> We'll confirm your pickup time.</p>`;
+  orderForm.parentNode.insertBefore(confirm, orderForm);
+}
+
+function resetAfterOrder() {
+  basket.length = 0;
+  renderBasket();
+  orderForm.reset();
+  pickupDate.value = document.querySelector(".cal-day.is-selected")
+    ? document.querySelector(".cal-day.is-selected").dataset.date
+    : (() => { const d = new Date(); d.setDate(d.getDate() + 1); return fmtDate(d.getFullYear(), d.getMonth(), d.getDate()); })();
+  document.getElementById("order-name").focus();
+  renderCalendar();
+  updateBasketLimits();
+}
+
 const orderForm = document.querySelector(".order-form");
 if (orderForm) {
-  orderForm.addEventListener("submit", (e) => {
+  orderForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = document.getElementById("order-name").value.trim();
     const contact = document.getElementById("order-contact").value.trim();
@@ -457,48 +494,40 @@ if (orderForm) {
     }
 
     const total = basket.reduce((s, i) => s + i.qty * i.price, 0);
+    const items = basket.map((i) => ({ name: i.name, type: i.type || "", qty: i.qty, price: i.price }));
+
+    // Try Firestore if user is logged in and Firebase is ready
+    const user = typeof currentUser === "function" ? currentUser() : null;
+    if (user && typeof placeOrder === "function") {
+      try {
+        await placeOrder({
+          customerId: user.uid,
+          customerName: name, customerContact: contact,
+          date, time, notes, items, total,
+          status: "pending",
+          createdAt: new Date().toISOString()
+        });
+        resetAfterOrder();
+        showOrderConfirmation(null);
+        return;
+      } catch (err) {
+        alert("Order failed: " + err.message);
+        return;
+      }
+    }
+
+    // Fallback to localStorage
     const orders = getOrders();
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     orders.push({
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      createdAt: new Date().toISOString(),
-      date,
-      time,
-      customerName: name,
-      customerContact: contact,
-      notes,
-      items: basket.map((i) => ({ name: i.name, type: i.type || "", qty: i.qty, price: i.price })),
-      total,
-      status: "pending"
+      id, createdAt: new Date().toISOString(),
+      date, time, customerName: name, customerContact: contact, notes,
+      items, total, status: "pending"
     });
     setOrders(orders);
-
-    basket.length = 0;
-    renderBasket();
-    orderForm.reset();
-    pickupDate.value = document.querySelector(".cal-day.is-selected")
-      ? document.querySelector(".cal-day.is-selected").dataset.date
-      : (() => { const d = new Date(); d.setDate(d.getDate() + 1); return fmtDate(d.getFullYear(), d.getMonth(), d.getDate()); })();
-    document.getElementById("order-name").focus();
-
-    // Show confirmation
-    const existing = document.querySelector(".order-confirmation");
-    if (existing) existing.remove();
-
-    const confirm = document.createElement("div");
-    confirm.className = "order-confirmation";
-    confirm.innerHTML = `
-      <p><strong>Order sent!</strong> We'll confirm your pickup time.</p>
-      <p class="order-confirm-ref">Reference: #${orders[orders.length - 1].id.slice(-6)}</p>
-    `;
-    orderForm.parentNode.insertBefore(confirm, orderForm);
-
-    renderCalendar();
-    updateBasketLimits();
+    resetAfterOrder();
+    showOrderConfirmation(id.slice(-6));
   });
-}
-
-function setOrders(orders) {
-  localStorage.setItem("brood_orders", JSON.stringify(orders));
 }
 
 // ── Auth UI ─────────────────────────────────────────────────────────────────
@@ -650,63 +679,4 @@ async function loadUserOrders(uid) {
   }
 }
 
-// ── Use Firestore for order submission when available ───────────────────────
 
-const origSubmitHandler = orderForm ? orderForm.submit : null;
-
-if (orderForm && typeof placeOrder === "function") {
-  const origListener = orderForm._listeners ? orderForm._listeners[0] : null;
-  // Wrap the submit to try Firestore first
-  const origSubmit = orderForm.addEventListener;
-  orderForm.addEventListener("submit", async (e) => {
-    // Only intercept if Firebase is ready
-    if (typeof placeOrder !== "function" || !currentUser()) return;
-
-    const user = currentUser();
-    if (!user) return;
-
-    e.preventDefault();
-    const name = document.getElementById("order-name").value.trim();
-    const contact = document.getElementById("order-contact").value.trim();
-    const notes = document.getElementById("order-notes").value.trim();
-    const date = pickupDate ? pickupDate.value : "";
-    const slot = document.querySelector(".slot-btn.is-selected");
-    const time = slot ? slot.dataset.time : "";
-
-    if (!name || !contact) return;
-    if (basket.length === 0) { alert("Your basket is empty."); return; }
-    if (isDateFull(date)) { alert("This date is fully booked."); return; }
-
-    const total = basket.reduce((s, i) => s + i.qty * i.price, 0);
-    try {
-      await placeOrder({
-        customerId: user.uid,
-        customerName: name,
-        customerContact: contact,
-        date, time, notes,
-        items: basket.map((i) => ({ name: i.name, type: i.type || "", qty: i.qty, price: i.price })),
-        total,
-        status: "pending",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      basket.length = 0;
-      renderBasket();
-      orderForm.reset();
-      pickupDate.value = document.querySelector(".cal-day.is-selected")
-        ? document.querySelector(".cal-day.is-selected").dataset.date
-        : (() => { const d = new Date(); d.setDate(d.getDate() + 1); return fmtDate(d.getFullYear(), d.getMonth(), d.getDate()); })();
-
-      const existing = document.querySelector(".order-confirmation");
-      if (existing) existing.remove();
-      const confirm = document.createElement("div");
-      confirm.className = "order-confirmation";
-      confirm.innerHTML = `<p><strong>Order sent!</strong> We'll confirm your pickup time.</p>`;
-      orderForm.parentNode.insertBefore(confirm, orderForm);
-      renderCalendar();
-      updateBasketLimits();
-    } catch (err) {
-      alert("Order failed: " + err.message);
-    }
-  }, true);
-}
