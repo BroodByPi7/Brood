@@ -205,8 +205,19 @@
 
       <div class="order-layout">
         <div class="order-calendar">
-          <label for="pickup-date">Pickup date</label>
-          <input type="date" id="pickup-date">
+          <label>Pickup date</label>
+          <div class="calendar-widget" id="calendar-widget" role="grid" aria-label="Pickup date calendar">
+            <div class="cal-header">
+              <button class="cal-nav cal-prev" type="button" aria-label="Previous month">&larr;</button>
+              <span class="cal-label"></span>
+              <button class="cal-nav cal-next" type="button" aria-label="Next month">&rarr;</button>
+            </div>
+            <div class="cal-dows">
+              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+            </div>
+            <div class="cal-grid"></div>
+          </div>
+          <input type="hidden" id="pickup-date" name="pickup-date">
           <p class="order-cutoff">Orders placed after 6pm are confirmed for the day after next.</p>
         </div>
         <div class="order-slots">

@@ -280,15 +280,79 @@ document.querySelectorAll(".menu-card").forEach((card) => {
 // ── Order section ───────────────────────────────────────────────────────────
 
 const pickupDate = document.getElementById("pickup-date");
-if (pickupDate) {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const y = tomorrow.getFullYear();
-  const m = String(tomorrow.getMonth() + 1).padStart(2, "0");
-  const d = String(tomorrow.getDate()).padStart(2, "0");
-  pickupDate.min = `${y}-${m}-${d}`;
-  pickupDate.value = `${y}-${m}-${d}`;
+const calendar = document.getElementById("calendar-widget");
+const calGrid = calendar.querySelector(".cal-grid");
+const calLabel = calendar.querySelector(".cal-label");
+
+{
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  pickupDate.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
+
+let calMonth = new Date();
+calMonth.setDate(1);
+
+function fmtDate(y, m, d) {
+  return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+}
+
+function renderCalendar() {
+  const year = calMonth.getFullYear();
+  const month = calMonth.getMonth();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const first = new Date(year, month, 1);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const prevDays = new Date(year, month, 0).getDate();
+  const startOff = first.getDay() === 0 ? 6 : first.getDay() - 1;
+
+  calLabel.textContent = first.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+
+  let html = "";
+
+  for (let i = startOff - 1; i >= 0; i--) {
+    const d = prevDays - i;
+    html += `<div class="cal-day is-other" data-date="${fmtDate(year, month - 1, d)}">${d}</div>`;
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(year, month, d);
+    const ds = fmtDate(year, month, d);
+    let cls = "cal-day";
+    if (date < tomorrow) cls += " is-past";
+    if (date.toDateString() === today.toDateString()) cls += " is-today";
+    if (ds === pickupDate.value) cls += " is-selected";
+    html += `<div class="${cls}" data-date="${ds}">${d}</div>`;
+  }
+
+  const total = startOff + daysInMonth;
+  for (let d = 1; d <= (7 - total % 7) % 7; d++) {
+    html += `<div class="cal-day is-other" data-date="${fmtDate(year, month + 1, d)}">${d}</div>`;
+  }
+
+  calGrid.innerHTML = html;
+
+  calGrid.querySelectorAll(".cal-day:not(.is-past):not(.is-other)").forEach((day) => {
+    day.addEventListener("click", () => {
+      calGrid.querySelectorAll(".cal-day").forEach((d) => d.classList.remove("is-selected"));
+      day.classList.add("is-selected");
+      pickupDate.value = day.dataset.date;
+    });
+  });
+}
+
+renderCalendar();
+
+document.querySelectorAll(".cal-prev, .cal-next").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    calMonth.setMonth(calMonth.getMonth() + (btn.classList.contains("cal-next") ? 1 : -1));
+    renderCalendar();
+  });
+});
 
 document.querySelectorAll(".slot-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
