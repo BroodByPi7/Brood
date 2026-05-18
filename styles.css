@@ -155,7 +155,7 @@ button {
   place-items: center;
   position: relative;
   overflow: hidden;
-  padding: clamp(5rem, 9vw, 7rem) 1rem 3rem;
+  padding: 1rem;
   background: var(--paper);
 }
 
