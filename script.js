@@ -55,80 +55,12 @@ document.addEventListener("click", (event) => {
   }
 });
 
-const knownImages = [];
-const discoveryPromises = [];
-
-document.querySelectorAll(".menu-card").forEach((card) => {
-  const imgEl = card.querySelector(".card-img img");
-  if (imgEl) {
-    knownImages.push(imgEl.src);
-    return;
-  }
-
-  const name = card.querySelector(".card-body h4").textContent;
-  const isPreorder = card.closest(".menu-block").querySelector(".block-heading h3").textContent.includes("Pre Order");
-  const folder = isPreorder ? "Preorder" : "Daily";
-  const placeholder = card.querySelector(".card-placeholder");
-  if (!placeholder) return;
-
-  const words = name.toLowerCase().trim().split(/\s+/).filter(Boolean);
-  const candidates = [];
-  const seen = new Set();
-
-  const add = (s) => {
-    const lower = s.toLowerCase();
-    if (!seen.has(lower)) { seen.add(lower); candidates.push(s); }
-  };
-
-  const allCap = words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join("");
-  add(allCap);
-  add(allCap.replace(/s$/, ""));
-  add(words.map(w => w.toLowerCase()).join(""));
-  add(words.map(w => w.toLowerCase()).join("").replace(/s$/, ""));
-
-  const firstCap = words[0].charAt(0).toUpperCase() + words[0].slice(1).toLowerCase() + words.slice(1).map(w => w.toLowerCase()).join("");
-  add(firstCap);
-  add(firstCap.replace(/s$/, ""));
-
-  if (words.length > 2) {
-    const last = words[words.length - 1];
-    const firstLast = words[0].charAt(0).toUpperCase() + words[0].slice(1) + last.charAt(0).toUpperCase() + last.slice(1);
-    add(firstLast);
-    add(firstLast.replace(/s$/, ""));
-    const firstLastLower = words[0].toLowerCase() + last.toLowerCase();
-    add(firstLastLower);
-    add(firstLastLower.replace(/s$/, ""));
-  }
-
-  discoveryPromises.push(tryCandidate(candidates, folder, placeholder, card));
-});
-
-async function tryCandidate(candidates, folder, placeholder, card) {
-  const name = card.querySelector(".card-body h4").textContent;
-  try {
-    const url = await Promise.any(candidates.map(c => {
-      const u = `Images/${folder}/${c}.jpg`;
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(u);
-        img.onerror = reject;
-        img.decoding = "async";
-        img.src = u;
-      });
-    }));
-    const wrapper = document.createElement("div");
-    wrapper.className = "card-img";
-    wrapper.innerHTML = `<img src="${url}" alt="${name}" loading="lazy">`;
-    placeholder.parentNode.replaceChild(wrapper, placeholder);
-    knownImages.push(url);
-  } catch (e) {}
-}
-
-Promise.allSettled(discoveryPromises).then(() => {
+{
   const slideshow = document.querySelector(".menu-slideshow");
-  if (!slideshow || knownImages.length === 0) return;
+  const images = [...document.querySelectorAll(".menu-card .card-img img")].map(i => i.src);
+  if (!slideshow || images.length === 0) return;
 
-  knownImages.forEach((src) => {
+  images.forEach((src) => {
     const div = document.createElement("div");
     div.className = "slide-bg";
     div.style.backgroundImage = `url(${src})`;
@@ -136,7 +68,6 @@ Promise.allSettled(discoveryPromises).then(() => {
   });
 
   const slides = slideshow.querySelectorAll(".slide-bg");
-  if (slides.length === 0) return;
   slides[0].classList.add("is-active");
 
   let current = 0;
@@ -145,7 +76,7 @@ Promise.allSettled(discoveryPromises).then(() => {
     current = (current + 1) % slides.length;
     slides[current].classList.add("is-active");
   }, 5000);
-});
+}
 
 const basket = [];
 const basketSidebar = document.querySelector(".basket-sidebar");
