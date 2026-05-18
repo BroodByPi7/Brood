@@ -494,8 +494,7 @@ p {
   }
 
   .frontpage-art {
-    width: 145vw;
-    max-width: none;
+    width: 100%;
   }
 
   .menu-panel {
