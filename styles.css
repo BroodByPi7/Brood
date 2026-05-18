@@ -496,7 +496,6 @@ p {
   .frontpage-art {
     width: 145vw;
     max-width: none;
-    transform: translateX(1.5rem);
   }
 
   .menu-panel {
