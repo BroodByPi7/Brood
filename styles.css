@@ -454,7 +454,7 @@ p {
 
 .calendar-widget {
   background: var(--paper);
-  padding: 0.75rem;
+  padding: 1rem;
   user-select: none;
 }
 
@@ -462,50 +462,52 @@ p {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  background: var(--brood-blue);
+  margin: -1rem -1rem 1rem -1rem;
+  padding: 0.6rem 0.5rem;
 }
 
 .cal-nav {
-  width: 2rem;
-  height: 2rem;
+  width: 2.2rem;
+  height: 2.2rem;
   display: grid;
   place-items: center;
-  border: 2px solid var(--brood-blue);
-  background: var(--paper);
-  color: var(--brood-blue);
-  font-size: 1rem;
-  font-weight: 700;
+  border: 0;
+  background: transparent;
+  color: var(--paper);
+  font-size: 0.9rem;
   cursor: pointer;
+  border-radius: 50%;
+  transition: background 100ms;
 }
 
 .cal-nav:hover {
-  background: var(--brood-blue);
-  color: var(--paper);
+  background: rgba(255, 254, 251, 0.2);
 }
 
 .cal-label {
-  font-weight: 850;
+  font-weight: 800;
   font-size: 1rem;
-  color: var(--ink);
+  color: var(--paper);
 }
 
 .cal-dows {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.25rem;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.4rem;
 }
 
 .cal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 1px;
-  background: var(--line);
+  gap: 0;
 }
 
 .cal-day {
@@ -515,9 +517,11 @@ p {
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--ink);
-  background: var(--paper);
   cursor: pointer;
   transition: background 80ms, color 80ms;
+  border-radius: 50%;
+  width: 90%;
+  margin: 0 auto;
 }
 
 .cal-day:hover {
@@ -526,24 +530,29 @@ p {
 
 .cal-day.is-other {
   color: var(--muted);
-  opacity: 0.4;
+  opacity: 0.35;
   pointer-events: none;
 }
 
 .cal-day.is-past {
   color: var(--muted);
-  opacity: 0.35;
+  opacity: 0.3;
   pointer-events: none;
 }
 
 .cal-day.is-selected {
   background: var(--brood-blue);
   color: var(--paper);
+  font-weight: 700;
 }
 
 .cal-day.is-today {
-  outline: 2px solid var(--brood-blue);
-  outline-offset: -2px;
+  font-weight: 700;
+  color: var(--brood-blue);
+}
+
+.cal-day.is-today.is-selected {
+  color: var(--paper);
 }
 
 .order-cutoff {
