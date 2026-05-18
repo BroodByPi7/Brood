@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brood | Artisanal Sourdough Bakery</title>
+  <meta name="description" content="Brood is an artisanal sourdough bakery with daily shio pans, croissants, focaccias, sourdoughs, shoku pans, baguettes, and preorder cakes, pies, viennoiseries, cookies, rolls, donuts, and brioche.">
+  <meta name="theme-color" content="#073f9e">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#menu">Skip to menu</a>
+
+  <header class="corner-menu" aria-label="Site navigation">
+    <button class="menu-trigger" type="button" aria-expanded="false" aria-controls="navigation-links">
+      <span class="menu-dot"></span>
+      <span class="menu-line"></span>
+      <span class="menu-dot"></span>
+      <span class="menu-line"></span>
+      <span class="menu-dot"></span>
+      <span class="menu-line"></span>
+      <span class="sr-only">Open navigation</span>
+    </button>
+    <nav class="menu-panel" id="navigation-links" aria-label="Main navigation">
+      <a href="#menu">Menu</a>
+      <a href="#order">Order</a>
+      <a href="#pickup">Pickup</a>
+      <a href="#catering">Catering</a>
+      <a href="#about">About</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="frontpage" aria-labelledby="frontpage-title">
+      <h1 id="frontpage-title" class="sr-only">Brood Artisanal Sourdough Bakery</h1>
+      <img class="frontpage-art" src="assets/frontpage.png" alt="Brood Artisanal Sourdough Bakery logo with a baker carrying bread">
+      <a class="scroll-cue" href="#menu" aria-label="Scroll to menu">
+        <span></span>
+      </a>
+    </section>
+
+    <section class="section menu-section" id="menu" aria-labelledby="menu-title">
+      <div class="section-heading">
+        <p class="eyebrow">Menu</p>
+        <h2 id="menu-title">Daily bakes and preorder shelves</h2>
+        <p>Daily items are baked for the regular counter and can also be pre-ordered. Preorder items are planned ahead so the dough, fillings, and finishing have enough time.</p>
+      </div>
+
+      <div class="menu-columns">
+        <article class="menu-block">
+          <div class="block-heading">
+            <span>01</span>
+            <h3>Daily Order Items</h3>
+          </div>
+          <div class="item-groups">
+            <div class="item-group">
+              <h4>Shio pans</h4>
+              <p>Plain, Cheese, Chocolate</p>
+            </div>
+            <div class="item-group">
+              <h4>Croissants</h4>
+              <p>Plain, Cheese, Chocolate</p>
+            </div>
+            <div class="item-group">
+              <h4>Pain au chocolat</h4>
+              <p>Chocolate-filled laminated pastry</p>
+            </div>
+            <div class="item-group">
+              <h4>Focaccias</h4>
+              <p>Plain, Tomato, Onion, Apple Bacon, Blueberry Honey</p>
+            </div>
+            <div class="item-group">
+              <h4>Sourdoughs</h4>
+              <p>Boulle, Sandwich loaf <em>limited</em></p>
+            </div>
+            <div class="item-group">
+              <h4>Shoku pans</h4>
+              <p>Plain, Chocolate spiral, Matcha spiral <em>limited</em></p>
+            </div>
+            <div class="item-group">
+              <h4>Baguette</h4>
+              <p>Classic lean sourdough baguette</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="menu-block">
+          <div class="block-heading">
+            <span>02</span>
+            <h3>Pre Order Items</h3>
+          </div>
+          <div class="item-groups">
+            <div class="item-group">
+              <h4>Cakes</h4>
+              <p>Cheesecakes with requestable flavours, Chocolate cake, Carrot cake, Fresh fruits cake, Vanilla</p>
+            </div>
+            <div class="item-group">
+              <h4>Pies</h4>
+              <p>Mango, Apple, Blueberry, Frangipan, Lemon meringue</p>
+            </div>
+            <div class="item-group">
+              <h4>Viennoiseries</h4>
+              <p>Layered butter pastries by request</p>
+            </div>
+            <div class="item-group">
+              <h4>Brownies</h4>
+              <p>Chocolate-forward tray bakes</p>
+            </div>
+            <div class="item-group">
+              <h4>Cookies</h4>
+              <p>Chocolate chip, Amaretti, Coco macaroons</p>
+            </div>
+            <div class="item-group">
+              <h4>Cinnamon rolls and donuts</h4>
+              <p>Soft sourdough rolls and small-batch donuts</p>
+            </div>
+            <div class="item-group">
+              <h4>Brioche loafs or buns</h4>
+              <p>Bacon cheese, Chocolate almond</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section order-section" id="order" aria-labelledby="order-title">
+      <div class="section-heading narrow">
+        <p class="eyebrow">Order</p>
+        <h2 id="order-title">A simple ordering flow comes next</h2>
+        <p>For now this page separates daily bakes from preorder items. The next pass can add the calendar, cut-off times, pickup slots, and a clear order request form without crowding the front page.</p>
+      </div>
+      <div class="order-notes" aria-label="Ordering notes">
+        <p>Daily items can be pre-ordered.</p>
+        <p>Limited items should show availability before checkout.</p>
+        <p>Preorder items need a date-aware request flow.</p>
+      </div>
+    </section>
+
+    <section class="section details-section" id="pickup" aria-labelledby="pickup-title">
+      <div class="section-heading">
+        <p class="eyebrow">Pickup</p>
+        <h2 id="pickup-title">Pickup details stay calm and clear</h2>
+      </div>
+      <div class="detail-grid">
+        <article>
+          <h3>Pickup windows</h3>
+          <p>Use fixed pickup windows once the calendar is added, with daily bakes separated from longer preorder items.</p>
+        </article>
+        <article>
+          <h3>Delivery notes</h3>
+          <p>Delivery can be handled as a later confirmation step or by local zones after the first version is live.</p>
+        </article>
+        <article>
+          <h3>Limited bakes</h3>
+          <p>Sandwich loafs, matcha spiral shoku pans, and other limited items should be easy to mark as sold out.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section catering-section" id="catering" aria-labelledby="catering-title">
+      <div class="section-heading narrow">
+        <p class="eyebrow">Catering</p>
+        <h2 id="catering-title">Boxes, trays, and planned bakes</h2>
+        <p>Catering can draw from the preorder list: cakes, pies, viennoiseries, brownies, cookies, cinnamon rolls, donuts, and brioche buns. The design should stay simple and request-led.</p>
+      </div>
+    </section>
+
+    <section class="section about-section" id="about" aria-labelledby="about-title">
+      <div class="section-heading narrow">
+        <p class="eyebrow">About</p>
+        <h2 id="about-title">Artisanal sourdough bakery</h2>
+        <p>Brood should feel like the logo: hand-made, direct, blue ink on white paper, with enough empty space that the bakery has room to breathe.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
