@@ -555,6 +555,12 @@ p {
   color: var(--paper);
 }
 
+.cal-day.is-full {
+  color: var(--muted);
+  opacity: 0.25;
+  pointer-events: none;
+}
+
 .order-cutoff {
   margin-top: 0.75rem;
   font-size: 0.9rem;
@@ -1106,4 +1112,50 @@ p {
   color: var(--brood-blue);
   font-size: 0.75rem;
   font-weight: 900;
+}
+
+.order-confirmation {
+  background: rgba(255, 254, 251, 0.12);
+  border: 2px solid var(--paper);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.order-confirmation p {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.order-confirm-ref {
+  font-size: 0.8rem !important;
+  opacity: 0.7;
+  margin-top: 0.3rem !important;
+  font-family: monospace;
+}
+
+.card-limit {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--red);
+  margin-top: 0.3rem;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--red);
+}
+
+/* ── Admin link ───────────────────────── */
+
+.admin-link {
+  font-size: 0.75rem;
+  color: var(--muted);
+  opacity: 0.5;
+  text-decoration: none;
+  margin-left: auto;
+}
+
+.admin-link:hover {
+  opacity: 1;
 }

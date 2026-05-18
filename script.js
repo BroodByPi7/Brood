@@ -297,6 +297,54 @@ function fmtDate(y, m, d) {
   return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }
 
+document.querySelectorAll(".slot-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".slot-btn").forEach((b) => b.classList.remove("is-selected"));
+    btn.classList.add("is-selected");
+  });
+});
+
+// ── Order storage and limits ────────────────────────────────────────────────
+
+function getOrders() {
+  try { return JSON.parse(localStorage.getItem("brood_orders")) || []; } catch { return []; }
+}
+
+function getLimits() {
+  try { return JSON.parse(localStorage.getItem("brood_limits")); } catch {}
+  return { maxPerDay: 50, items: {} };
+}
+
+function getItemCountForDate(date, itemName) {
+  const orders = getOrders().filter((o) => o.date === date && o.status !== "declined");
+  let count = 0;
+  orders.forEach((o) => {
+    o.items.forEach((i) => {
+      if (i.name === itemName) count += i.qty;
+    });
+  });
+  return count;
+}
+
+function getTotalCountForDate(date) {
+  const orders = getOrders().filter((o) => o.date === date && o.status !== "declined");
+  return orders.reduce((s, o) => s + o.items.reduce((s2, i) => s2 + i.qty, 0), 0);
+}
+
+function isDateFull(date) {
+  const limits = getLimits();
+  if (!limits.maxPerDay) return false;
+  return getTotalCountForDate(date) >= limits.maxPerDay;
+}
+
+function isItemSoldOut(date, itemName) {
+  const limits = getLimits();
+  const itemLimit = limits.items[itemName];
+  if (!itemLimit || !itemLimit.max) return false;
+  return getItemCountForDate(date, itemName) >= itemLimit.max;
+}
+
+// ── Calendar with availability ──────────────────────────────────────────────
 function renderCalendar() {
   const year = calMonth.getFullYear();
   const month = calMonth.getMonth();
@@ -326,6 +374,7 @@ function renderCalendar() {
     if (date < tomorrow) cls += " is-past";
     if (date.toDateString() === today.toDateString()) cls += " is-today";
     if (ds === pickupDate.value) cls += " is-selected";
+    if (isDateFull(ds)) cls += " is-full";
     html += `<div class="${cls}" data-date="${ds}">${d}</div>`;
   }
 
@@ -336,11 +385,12 @@ function renderCalendar() {
 
   calGrid.innerHTML = html;
 
-  calGrid.querySelectorAll(".cal-day:not(.is-past):not(.is-other)").forEach((day) => {
+  calGrid.querySelectorAll(".cal-day:not(.is-past):not(.is-other):not(.is-full)").forEach((day) => {
     day.addEventListener("click", () => {
       calGrid.querySelectorAll(".cal-day").forEach((d) => d.classList.remove("is-selected"));
       day.classList.add("is-selected");
       pickupDate.value = day.dataset.date;
+      updateBasketLimits();
     });
   });
 }
@@ -354,12 +404,27 @@ document.querySelectorAll(".cal-prev, .cal-next").forEach((btn) => {
   });
 });
 
-document.querySelectorAll(".slot-btn").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".slot-btn").forEach((b) => b.classList.remove("is-selected"));
-    btn.classList.add("is-selected");
+// ── Basket limit warnings ──────────────────────────────────────────────────
+
+function updateBasketLimits() {
+  const date = pickupDate.value;
+  const limits = getLimits();
+
+  document.querySelectorAll(".menu-card").forEach((card) => {
+    const name = card.querySelector(".card-body h4").textContent;
+    const limitEl = card.querySelector(".card-limit");
+    if (limitEl) limitEl.remove();
+
+    if (date && isItemSoldOut(date, name)) {
+      const badge = document.createElement("span");
+      badge.className = "card-limit";
+      badge.textContent = "Sold out for this date";
+      card.querySelector(".card-body").appendChild(badge);
+    }
   });
-});
+}
+
+// ── Form submission ─────────────────────────────────────────────────────────
 
 const orderForm = document.querySelector(".order-form");
 if (orderForm) {
@@ -379,21 +444,56 @@ if (orderForm) {
       return;
     }
 
-    const items = basket.map((i) => `  ${i.qty}× ${i.name}${i.type ? " (" + i.type + ")" : ""} — $${(i.qty * i.price).toFixed(2)}`).join("\n");
+    if (isDateFull(date)) {
+      alert("Sorry, this date is fully booked. Please choose another date.");
+      return;
+    }
+
+    for (const item of basket) {
+      if (isItemSoldOut(date, item.name)) {
+        alert(`Sorry, ${item.name} is sold out for this date.`);
+        return;
+      }
+    }
+
     const total = basket.reduce((s, i) => s + i.qty * i.price, 0);
+    const orders = getOrders();
+    orders.push({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      createdAt: new Date().toISOString(),
+      date,
+      time,
+      customerName: name,
+      customerContact: contact,
+      notes,
+      items: basket.map((i) => ({ name: i.name, type: i.type || "", qty: i.qty, price: i.price })),
+      total,
+      status: "pending"
+    });
+    setOrders(orders);
 
-    const msg = `New order request:
-Name: ${name}
-Contact: ${contact}
-Date: ${date}
-Time: ${time}
-${notes ? "Notes: " + notes : ""}
+    basket.length = 0;
+    renderBasket();
+    orderForm.reset();
+    document.getElementById("order-name").focus();
 
-Items:
-${items}
+    // Show confirmation
+    const existing = document.querySelector(".order-confirmation");
+    if (existing) existing.remove();
 
-Total: $${total.toFixed(2)}`;
+    const confirm = document.createElement("div");
+    confirm.className = "order-confirmation";
+    confirm.innerHTML = `
+      <p><strong>Order sent!</strong> We'll confirm your pickup time.</p>
+      <p class="order-confirm-ref">Reference: #${orders[orders.length - 1].id.slice(-6)}</p>
+    `;
+    orderForm.parentNode.insertBefore(confirm, orderForm);
 
-    alert(msg);
+    renderCalendar();
+    updateBasketLimits();
   });
+}
+
+function setOrders(orders) {
+  localStorage.setItem("brood_orders", JSON.stringify(orders));
 }
