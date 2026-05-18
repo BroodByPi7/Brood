@@ -104,23 +104,24 @@ document.querySelectorAll(".menu-card").forEach((card) => {
 });
 
 async function tryCandidate(candidates, folder, placeholder, card) {
-  for (const c of candidates) {
-    const url = `Images/${folder}/${c}.jpg`;
-    try {
-      await new Promise((resolve, reject) => {
+  const name = card.querySelector(".card-body h4").textContent;
+  try {
+    const url = await Promise.any(candidates.map(c => {
+      const u = `Images/${folder}/${c}.jpg`;
+      return new Promise((resolve, reject) => {
         const img = new Image();
-        img.onload = resolve;
+        img.onload = () => resolve(u);
         img.onerror = reject;
-        img.src = url;
+        img.decoding = "async";
+        img.src = u;
       });
-      const wrapper = document.createElement("div");
-      wrapper.className = "card-img";
-      wrapper.innerHTML = `<img src="${url}" alt="${card.querySelector(".card-body h4").textContent}" loading="lazy">`;
-      placeholder.parentNode.replaceChild(wrapper, placeholder);
-      knownImages.push(url);
-      return;
-    } catch (e) {}
-  }
+    }));
+    const wrapper = document.createElement("div");
+    wrapper.className = "card-img";
+    wrapper.innerHTML = `<img src="${url}" alt="${name}" loading="lazy">`;
+    placeholder.parentNode.replaceChild(wrapper, placeholder);
+    knownImages.push(url);
+  } catch (e) {}
 }
 
 Promise.allSettled(discoveryPromises).then(() => {
