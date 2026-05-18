@@ -154,6 +154,15 @@ function renderBasket() {
       renderBasket();
     });
   });
+
+  const summaryEl = document.querySelector(".order-basket-summary");
+  if (summaryEl) {
+    const items = basket.map((i) => `${i.qty}× ${i.name}`).join(", ");
+    summaryEl.textContent = count > 0 ? `${count} item${count !== 1 ? "s" : ""}` : "0 items";
+    if (count > 0) {
+      summaryEl.textContent += ` — $${total.toFixed(2)}`;
+    }
+  }
 }
 
 function openBasket() {
@@ -267,3 +276,60 @@ document.querySelectorAll(".menu-card").forEach((card) => {
     });
   });
 });
+
+// ── Order section ───────────────────────────────────────────────────────────
+
+const pickupDate = document.getElementById("pickup-date");
+if (pickupDate) {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const y = tomorrow.getFullYear();
+  const m = String(tomorrow.getMonth() + 1).padStart(2, "0");
+  const d = String(tomorrow.getDate()).padStart(2, "0");
+  pickupDate.min = `${y}-${m}-${d}`;
+  pickupDate.value = `${y}-${m}-${d}`;
+}
+
+document.querySelectorAll(".slot-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".slot-btn").forEach((b) => b.classList.remove("is-selected"));
+    btn.classList.add("is-selected");
+  });
+});
+
+const orderForm = document.querySelector(".order-form");
+if (orderForm) {
+  orderForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = document.getElementById("order-name").value.trim();
+    const contact = document.getElementById("order-contact").value.trim();
+    const notes = document.getElementById("order-notes").value.trim();
+    const date = pickupDate ? pickupDate.value : "";
+    const slot = document.querySelector(".slot-btn.is-selected");
+    const time = slot ? slot.dataset.time : "";
+
+    if (!name || !contact) return;
+
+    if (basket.length === 0) {
+      alert("Your basket is empty. Add items from the menu first.");
+      return;
+    }
+
+    const items = basket.map((i) => `  ${i.qty}× ${i.name}${i.type ? " (" + i.type + ")" : ""} — $${(i.qty * i.price).toFixed(2)}`).join("\n");
+    const total = basket.reduce((s, i) => s + i.qty * i.price, 0);
+
+    const msg = `New order request:
+Name: ${name}
+Contact: ${contact}
+Date: ${date}
+Time: ${time}
+${notes ? "Notes: " + notes : ""}
+
+Items:
+${items}
+
+Total: $${total.toFixed(2)}`;
+
+    alert(msg);
+  });
+}

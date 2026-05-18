@@ -199,14 +199,40 @@
     <section class="section order-section" id="order" aria-labelledby="order-title">
       <div class="section-heading narrow">
         <p class="eyebrow">Order</p>
-        <h2 id="order-title">A simple ordering flow comes next</h2>
-        <p>For now this page separates daily bakes from preorder items. The next pass can add the calendar, cut-off times, pickup slots, and a clear order request form without crowding the front page.</p>
+        <h2 id="order-title">Pick a day, pick a slot</h2>
+        <p>Select your pickup date and time, tell us what you need, and we'll confirm your order.</p>
       </div>
-      <div class="order-notes" aria-label="Ordering notes">
-        <p>Daily items can be pre-ordered.</p>
-        <p>Limited items should show availability before checkout.</p>
-        <p>Preorder items need a date-aware request flow.</p>
+
+      <div class="order-layout">
+        <div class="order-calendar">
+          <label for="pickup-date">Pickup date</label>
+          <input type="date" id="pickup-date">
+          <p class="order-cutoff">Orders placed after 6pm are confirmed for the day after next.</p>
+        </div>
+        <div class="order-slots">
+          <p class="order-slots-label">Pickup time</p>
+          <div class="slot-grid">
+            <button class="slot-btn" type="button" data-time="8:00-9:00">8–9 AM</button>
+            <button class="slot-btn" type="button" data-time="9:00-10:00">9–10 AM</button>
+            <button class="slot-btn" type="button" data-time="10:00-11:00">10–11 AM</button>
+            <button class="slot-btn" type="button" data-time="11:00-12:00">11–12 PM</button>
+            <button class="slot-btn" type="button" data-time="12:00-13:00">12–1 PM</button>
+            <button class="slot-btn" type="button" data-time="13:00-14:00">1–2 PM</button>
+          </div>
+        </div>
       </div>
+
+      <form class="order-form" novalidate>
+        <div class="order-form-row">
+          <input type="text" id="order-name" placeholder="Your name" required>
+          <input type="text" id="order-contact" placeholder="Email or phone" required>
+        </div>
+        <textarea id="order-notes" rows="3" placeholder="Order notes or special requests (optional)"></textarea>
+        <div class="order-form-foot">
+          <span class="order-basket-info">Your basket: <span class="order-basket-summary">0 items</span></span>
+          <button class="order-submit" type="submit">Send order request</button>
+        </div>
+      </form>
     </section>
 
     <section class="section details-section" id="pickup" aria-labelledby="pickup-title">
