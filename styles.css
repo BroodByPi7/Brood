@@ -108,6 +108,9 @@ button {
 }
 
 .menu-panel {
+  position: absolute;
+  left: calc(100% + 0.8rem);
+  top: 0;
   width: 12.5rem;
   display: grid;
   gap: 0.1rem;
