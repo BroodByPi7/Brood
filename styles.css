@@ -150,7 +150,7 @@ button {
 }
 
 .frontpage {
-  min-height: 100svh;
+  height: 100svh;
   display: grid;
   place-items: center;
   position: relative;
