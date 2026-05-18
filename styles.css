@@ -160,7 +160,7 @@ button {
 }
 
 .frontpage-art {
-  width: min(100%, 1024px);
+  width: 100%;
   max-height: min(84svh, 820px);
   object-fit: contain;
   display: block;
@@ -491,10 +491,6 @@ p {
   .frontpage {
     padding-top: 5.25rem;
     align-items: center;
-  }
-
-  .frontpage-art {
-    width: 145vw;
   }
 
   .menu-panel {
