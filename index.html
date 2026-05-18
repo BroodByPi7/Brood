@@ -34,13 +34,15 @@
   <main>
     <section class="frontpage" aria-labelledby="frontpage-title">
       <h1 id="frontpage-title" class="sr-only">Brood Artisanal Sourdough Bakery</h1>
-      <img class="frontpage-art" src="assets/frontpage.png" alt="Brood Artisanal Sourdough Bakery logo with a baker carrying bread">
+      <img class="frontpage-art" src="Images/Logo.png" alt="Brood Artisanal Sourdough Bakery logo with a baker carrying bread">
       <a class="scroll-cue" href="#menu" aria-label="Scroll to menu">
         <span></span>
       </a>
     </section>
 
     <section class="section menu-section" id="menu" aria-labelledby="menu-title">
+      <div class="menu-slideshow" aria-hidden="true"></div>
+      <div class="menu-overlay"></div>
       <div class="section-heading">
         <p class="eyebrow">Menu</p>
         <h2 id="menu-title">Daily bakes and preorder shelves</h2>
@@ -53,34 +55,69 @@
             <span>01</span>
             <h3>Daily Order Items</h3>
           </div>
-          <div class="item-groups">
-            <div class="item-group">
-              <h4>Shio pans</h4>
-              <p>Plain, Cheese, Chocolate</p>
+          <div class="menu-grid">
+            <div class="menu-card" data-price="4.00" data-types='["Plain","Cheese","Chocolate"]'>
+              <div class="card-img card-placeholder">
+                <span>Photo coming soon</span>
+              </div>
+              <div class="card-body">
+                <h4>Shio pans</h4>
+                <p>Plain, Cheese, Chocolate</p>
+              </div>
             </div>
-            <div class="item-group">
-              <h4>Croissants</h4>
-              <p>Plain, Cheese, Chocolate</p>
+            <div class="menu-card" data-price="4.50" data-types='["Plain","Cheese","Chocolate"]'>
+              <div class="card-img">
+                <img src="Images/Daily/Croissant.jpg" alt="Croissants" loading="lazy">
+              </div>
+              <div class="card-body">
+                <h4>Croissants</h4>
+                <p>Plain, Cheese, Chocolate</p>
+              </div>
             </div>
-            <div class="item-group">
-              <h4>Pain au chocolat</h4>
-              <p>Chocolate-filled laminated pastry</p>
+            <div class="menu-card" data-price="5.00">
+              <div class="card-img">
+                <img src="Images/Daily/PainAuChocolate.jpg" alt="Pain au chocolat" loading="lazy">
+              </div>
+              <div class="card-body">
+                <h4>Pain au chocolat</h4>
+                <p>Chocolate-filled laminated pastry</p>
+              </div>
             </div>
-            <div class="item-group">
-              <h4>Focaccias</h4>
-              <p>Plain, Tomato, Onion, Apple Bacon, Blueberry Honey</p>
+            <div class="menu-card" data-price="6.00" data-types='["Plain","Tomato","Onion","Apple Bacon","Blueberry Honey"]'>
+              <div class="card-img">
+                <img src="Images/Daily/FoccaciaPlain.jpg" alt="Focaccias" loading="lazy">
+              </div>
+              <div class="card-body">
+                <h4>Focaccias</h4>
+                <p>Plain, Tomato, Onion, Apple Bacon, Blueberry Honey</p>
+              </div>
             </div>
-            <div class="item-group">
-              <h4>Sourdoughs</h4>
-              <p>Boulle, Sandwich loaf <em>limited</em></p>
+            <div class="menu-card" data-price="7.00" data-types='["Boulle","Sandwich loaf"]'>
+              <div class="card-img">
+                <img src="Images/Daily/SourdoughCranberry.jpg" alt="Sourdoughs" loading="lazy">
+              </div>
+              <div class="card-body">
+                <h4>Sourdoughs</h4>
+                <p>Boulle, Sandwich loaf <em>limited</em></p>
+              </div>
             </div>
-            <div class="item-group">
-              <h4>Shoku pans</h4>
-              <p>Plain, Chocolate spiral, Matcha spiral <em>limited</em></p>
+            <div class="menu-card" data-price="6.00" data-types='["Plain","Chocolate spiral","Matcha spiral"]'>
+              <div class="card-img">
+                <img src="Images/Daily/ShokuPan.jpg" alt="Shoku pans" loading="lazy">
+              </div>
+              <div class="card-body">
+                <h4>Shoku pans</h4>
+                <p>Plain, Chocolate spiral, Matcha spiral <em>limited</em></p>
+              </div>
             </div>
-            <div class="item-group">
-              <h4>Baguette</h4>
-              <p>Classic lean sourdough baguette</p>
+            <div class="menu-card" data-price="4.00">
+              <div class="card-img">
+                <img src="Images/Daily/Baguette.jpg" alt="Baguette" loading="lazy">
+              </div>
+              <div class="card-body">
+                <h4>Baguette</h4>
+                <p>Classic lean sourdough baguette</p>
+              </div>
             </div>
           </div>
         </article>
@@ -90,34 +127,69 @@
             <span>02</span>
             <h3>Pre Order Items</h3>
           </div>
-          <div class="item-groups">
-            <div class="item-group">
-              <h4>Cakes</h4>
-              <p>Cheesecakes with requestable flavours, Chocolate cake, Carrot cake, Fresh fruits cake, Vanilla</p>
+          <div class="menu-grid">
+            <div class="menu-card" data-price="25.00" data-types='["Cheesecakes","Chocolate cake","Carrot cake","Fresh fruits cake","Vanilla"]'>
+              <div class="card-img">
+                <img src="Images/Preorder/ChocolateCake.jpg" alt="Cakes" loading="lazy">
+              </div>
+              <div class="card-body">
+                <h4>Cakes</h4>
+                <p>Cheesecakes with requestable flavours, Chocolate cake, Carrot cake, Fresh fruits cake, Vanilla</p>
+              </div>
             </div>
-            <div class="item-group">
-              <h4>Pies</h4>
-              <p>Mango, Apple, Blueberry, Frangipan, Lemon meringue</p>
+            <div class="menu-card" data-price="20.00" data-types='["Mango","Apple","Blueberry","Frangipan","Lemon meringue"]'>
+              <div class="card-img">
+                <img src="Images/Preorder/ApplePie.jpg" alt="Pies" loading="lazy">
+              </div>
+              <div class="card-body">
+                <h4>Pies</h4>
+                <p>Mango, Apple, Blueberry, Frangipan, Lemon meringue</p>
+              </div>
             </div>
-            <div class="item-group">
-              <h4>Viennoiseries</h4>
-              <p>Layered butter pastries by request</p>
+            <div class="menu-card" data-price="3.50">
+              <div class="card-img">
+                <img src="Images/Preorder/Pastry.jpg" alt="Viennoiseries" loading="lazy">
+              </div>
+              <div class="card-body">
+                <h4>Viennoiseries</h4>
+                <p>Layered butter pastries by request</p>
+              </div>
             </div>
-            <div class="item-group">
-              <h4>Brownies</h4>
-              <p>Chocolate-forward tray bakes</p>
+            <div class="menu-card" data-price="4.50">
+              <div class="card-img card-placeholder">
+                <span>Photo coming soon</span>
+              </div>
+              <div class="card-body">
+                <h4>Brownies</h4>
+                <p>Chocolate-forward tray bakes</p>
+              </div>
             </div>
-            <div class="item-group">
-              <h4>Cookies</h4>
-              <p>Chocolate chip, Amaretti, Coco macaroons</p>
+            <div class="menu-card" data-price="3.00" data-types='["Chocolate chip","Amaretti","Coco macaroons"]'>
+              <div class="card-img">
+                <img src="Images/Preorder/Amaretti.jpg" alt="Cookies" loading="lazy">
+              </div>
+              <div class="card-body">
+                <h4>Cookies</h4>
+                <p>Chocolate chip, Amaretti, Coco macaroons</p>
+              </div>
             </div>
-            <div class="item-group">
-              <h4>Cinnamon rolls and donuts</h4>
-              <p>Soft sourdough rolls and small-batch donuts</p>
+            <div class="menu-card" data-price="4.00">
+              <div class="card-img">
+                <img src="Images/Preorder/CinnamonRoll.jpg" alt="Cinnamon rolls and donuts" loading="lazy">
+              </div>
+              <div class="card-body">
+                <h4>Cinnamon rolls and donuts</h4>
+                <p>Soft sourdough rolls and small-batch donuts</p>
+              </div>
             </div>
-            <div class="item-group">
-              <h4>Brioche loafs or buns</h4>
-              <p>Bacon cheese, Chocolate almond</p>
+            <div class="menu-card" data-price="5.00" data-types='["Bacon cheese","Chocolate almond"]'>
+              <div class="card-img card-placeholder">
+                <span>Photo coming soon</span>
+              </div>
+              <div class="card-body">
+                <h4>Brioche loafs or buns</h4>
+                <p>Bacon cheese, Chocolate almond</p>
+              </div>
             </div>
           </div>
         </article>
@@ -174,5 +246,32 @@
       </div>
     </section>
   </main>
+
+  <aside class="basket-sidebar" aria-label="Your basket">
+    <div class="basket-backdrop"></div>
+    <div class="basket-panel">
+      <div class="basket-header">
+        <h3>Your basket</h3>
+        <button class="basket-close" type="button" aria-label="Close basket">&times;</button>
+      </div>
+      <div class="basket-items"></div>
+      <div class="basket-footer">
+        <div class="basket-total">
+          <span>Total</span>
+          <span class="total-price">$0.00</span>
+        </div>
+        <button class="basket-checkout" type="button">Checkout</button>
+      </div>
+    </div>
+  </aside>
+
+  <button class="basket-toggle" type="button" aria-label="Open basket">
+    <span class="basket-toggle-icon">
+      <span class="basket-toggle-line"></span>
+      <span class="basket-toggle-line"></span>
+      <span class="basket-toggle-line"></span>
+    </span>
+    <span class="basket-count">0</span>
+  </button>
 </body>
 </html>
