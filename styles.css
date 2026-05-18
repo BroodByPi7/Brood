@@ -164,6 +164,7 @@ button {
   max-height: min(84svh, 820px);
   object-fit: contain;
   display: block;
+  margin-top: -2rem;
 }
 
 .scroll-cue {
