@@ -475,6 +475,9 @@ if (orderForm) {
     basket.length = 0;
     renderBasket();
     orderForm.reset();
+    pickupDate.value = document.querySelector(".cal-day.is-selected")
+      ? document.querySelector(".cal-day.is-selected").dataset.date
+      : (() => { const d = new Date(); d.setDate(d.getDate() + 1); return fmtDate(d.getFullYear(), d.getMonth(), d.getDate()); })();
     document.getElementById("order-name").focus();
 
     // Show confirmation
