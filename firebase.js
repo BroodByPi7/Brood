@@ -6,12 +6,12 @@
 // 5. Create an admin user manually in Firebase Auth
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBruZhff973pu0phUk2Clp_uI0iu8zyZxg",
+  authDomain: "brood-fe683.firebaseapp.com",
+  projectId: "brood-fe683",
+  storageBucket: "brood-fe683.firebasestorage.app",
+  messagingSenderId: "967801580505",
+  appId: "1:967801580505:web:5fec7b2cec0db87ee687c8"
 };
 
 let app, auth, db, isReady = false;
