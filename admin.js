@@ -211,6 +211,7 @@ function renderArchived() {
         <div class="order-card-items">${itemsHtml}</div>
         <div style="font-weight:700;color:var(--brood-blue)">$${(o.total || 0).toFixed(2)}</div>
         ${o.notes ? `<div class="order-card-notes">${escapeHtml(o.notes)}</div>` : ""}
+        <button class="btn-delete destructive delete-archived-btn" data-id="${o.id}">Delete permanently</button>
       </div>
     `;
   }).join("");
@@ -221,6 +222,20 @@ function escapeHtml(s) {
   d.textContent = s;
   return d.innerHTML;
 }
+
+document.addEventListener("click", function (e) {
+  const btn = e.target.closest(".delete-archived-btn");
+  if (!btn) return;
+  const id = btn.dataset.id;
+  if (!id) return;
+  if (!confirm("Permanently delete this archived order?")) return;
+  deleteOrder(id).then(() => {
+    allOrders = allOrders.filter((o) => o.id !== id);
+    renderArchived();
+  }).catch((err) => {
+    alert("Delete failed: " + err.message);
+  });
+});
 
 statusFilter.addEventListener("change", renderOrders);
 dateFilter.addEventListener("change", renderOrders);

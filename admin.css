@@ -323,6 +323,14 @@ body {
   background: #f0f0f0;
 }
 
+.btn-delete.destructive {
+  color: #d32f2f;
+  border-color: #e57373;
+}
+.btn-delete.destructive:hover {
+  background: #ffebee;
+}
+
 /* ── Limits tab ──────────────────────── */
 
 .admin-limits-note {
