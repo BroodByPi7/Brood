@@ -182,8 +182,9 @@ document.querySelector(".admin-save-limits").addEventListener("click", () => {
   });
 
   if (typeof saveLimits === "function") {
-    saveLimits({ maxPerDay, items });
-    showToast("Limits saved");
+    saveLimits({ maxPerDay, items })
+      .then(() => showToast("Limits saved"))
+      .catch((err) => showToast("Save failed: " + (err.message || err)));
   }
 });
 

@@ -21,7 +21,6 @@ try {
     app = firebase.initializeApp(firebaseConfig);
     auth = firebase.auth(app);
     db = firebase.firestore(app);
-    db.settings({ merge: true });
     isReady = true;
   }
 } catch (e) {
