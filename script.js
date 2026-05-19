@@ -1001,10 +1001,6 @@ function renderPickupOrders(orders) {
     }
   });
 
-  // Show map if any order is paid
-  const mapEl = document.getElementById("pickup-map");
-  if (mapEl) mapEl.style.display = visible.some((o) => o.status === "paid") ? "" : "none";
-
   container.querySelectorAll(".pickup-pay").forEach((btn) => {
     btn.addEventListener("click", () => {
       payWithOmise(btn.dataset.orderId);
