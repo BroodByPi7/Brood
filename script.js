@@ -598,7 +598,9 @@ if (orderForm) {
 // ── Auth UI ─────────────────────────────────────────────────────────────────
 
 const authModal = document.getElementById("auth-modal");
-const navAuthBtn = document.getElementById("nav-auth-btn");
+const userBtn = document.getElementById("user-btn");
+const userBtnLabel = document.getElementById("user-btn-label");
+const adminLinkTop = document.getElementById("admin-link-top");
 const accountPanel = document.getElementById("account-panel");
 let currentTab = "login";
 
@@ -615,7 +617,7 @@ function closeAuthModal() {
 authModal.querySelector(".auth-backdrop").addEventListener("click", closeAuthModal);
 authModal.querySelector(".auth-close").addEventListener("click", closeAuthModal);
 
-navAuthBtn.addEventListener("click", openAuthModal);
+userBtn.addEventListener("click", openAuthModal);
 
 document.querySelectorAll(".auth-tab").forEach((tab) => {
   tab.addEventListener("click", () => {
@@ -670,8 +672,8 @@ function setupAuth() {
   if (typeof onAuthChanged !== "function") return;
   onAuthChanged((user) => {
     if (user) {
-      navAuthBtn.textContent = "My account";
-      navAuthBtn.onclick = () => {
+      userBtnLabel.textContent = "My account";
+      userBtn.onclick = () => {
         accountPanel.classList.add("is-open");
         document.body.style.overflow = "hidden";
         loadUserOrders(user.uid);
@@ -679,9 +681,15 @@ function setupAuth() {
       getUserProfile(user.uid).then((profile) => {
         document.getElementById("account-name").textContent = profile ? profile.name : user.email;
       });
+      if (adminLinkTop && user.email === "broodbypi7@gmail.com") {
+        adminLinkTop.style.display = "";
+      } else if (adminLinkTop) {
+        adminLinkTop.style.display = "none";
+      }
     } else {
-      navAuthBtn.textContent = "Sign in";
-      navAuthBtn.onclick = openAuthModal;
+      userBtnLabel.textContent = "Sign in";
+      userBtn.onclick = openAuthModal;
+      if (adminLinkTop) adminLinkTop.style.display = "none";
     }
   });
 }

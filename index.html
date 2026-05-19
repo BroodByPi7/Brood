@@ -31,8 +31,6 @@
       <a href="#pickup">Pickup</a>
       <a href="#catering">Catering</a>
       <a href="#about">About</a>
-      <button class="nav-auth-btn" type="button" id="nav-auth-btn" style="background:none;border:none;color:var(--brood-blue);font:inherit;font-size:0.85rem;font-weight:700;cursor:pointer;padding:0.72rem 0.8rem;text-transform:uppercase;letter-spacing:0.06em;">Sign in</button>
-      <a href="admin.html" class="admin-link" style="opacity:0.3;font-size:0.7rem;">Admin</a>
       <select class="currency-select" id="currency-select" aria-label="Currency">
         <option value="USD">$ USD</option>
         <option value="EUR">€ EUR</option>
@@ -40,6 +38,16 @@
       </select>
     </nav>
   </header>
+
+  <button class="user-btn" id="user-btn" type="button" aria-label="Account">
+    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </svg>
+    <span id="user-btn-label">Sign in</span>
+  </button>
+
+  <a href="admin.html" class="admin-link-top" id="admin-link-top" style="display:none">Admin</a>
 
   <main>
     <section class="frontpage" aria-labelledby="frontpage-title">

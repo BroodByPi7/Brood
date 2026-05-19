@@ -1148,20 +1148,58 @@ p {
 
 /* ── Admin link ───────────────────────── */
 
-.admin-link {
-  font-size: 0.75rem;
-  color: var(--muted);
+.user-btn {
+  position: fixed;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--brood-blue);
+  background: transparent;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: background 120ms, color 120ms;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.user-btn:hover {
+  background: var(--brood-blue);
+  color: var(--paper);
+}
+
+.user-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+}
+
+.admin-link-top {
+  position: fixed;
+  top: 0.75rem;
+  right: 7.5rem;
+  z-index: 100;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--brood-blue);
   opacity: 0.5;
   text-decoration: none;
-  margin-left: auto;
+  padding: 0.25rem 0.5rem;
+  border: 2px solid transparent;
+  transition: opacity 120ms;
 }
 
-.admin-link:hover {
+.admin-link-top:hover {
   opacity: 1;
-}
-
-.nav-auth-btn {
-  font-size: 0.72rem !important;
 }
 
 .currency-select {
