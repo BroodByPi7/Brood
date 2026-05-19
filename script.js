@@ -942,7 +942,7 @@ async function sendOrderEmail(order) {
   const items = (order.items || []).map((i) => `${i.qty}× ${i.name}${i.type ? " (" + i.type + ")" : ""}`).join(", ");
   try {
     const res = await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
-      to_email: order.customerContact,
+      email: order.customerContact,
       customer_name: order.customerName || order.customerContact,
       date: order.date || "",
       time: order.time || "",
