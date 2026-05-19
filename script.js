@@ -842,22 +842,33 @@ function onReady() {
 if (typeof onAuthChanged === "function") onReady();
 else document.addEventListener("DOMContentLoaded", onReady);
 
-// ── Pickup section ───────────────────────────────────────────────────────────
+// ── Payment via Stripe Checkout ─────────────────────────────────────────────
 
-let unsubPickupOrders = null;
-
-function setupPickupOrders(user) {
-  const container = document.getElementById("pickup-orders");
-  if (!container) return;
-  if (unsubPickupOrders) { unsubPickupOrders(); unsubPickupOrders = null; }
-  if (typeof getUserOrders !== "function") {
-    container.innerHTML = '<p class="pickup-empty">Sign in to view your orders.</p>';
-    return;
+async function payWithStripe(orderId) {
+  try {
+    const callable = typeof firebase !== "undefined" && firebase.functions
+      ? firebase.functions().httpsCallable("createCheckoutSession")
+      : null;
+    if (!callable) {
+      document.getElementById("qr-modal").classList.add("is-open");
+      document.body.style.overflow = "hidden";
+      return;
+    }
+    const origin = window.location.origin;
+    const result = await callable({ orderId, origin });
+    if (result.data && result.data.url) {
+      window.location.href = result.data.url;
+    } else {
+      alert("Failed to create payment session.");
+    }
+  } catch (err) {
+    alert("Payment error: " + (err.message || "Unknown error"));
+    document.getElementById("qr-modal").classList.add("is-open");
+    document.body.style.overflow = "hidden";
   }
-  unsubPickupOrders = getUserOrders(user.uid, (orders) => {
-    renderPickupOrders(orders);
-  });
 }
+
+// ── Pickup section ───────────────────────────────────────────────────────────
 
 function renderPickupOrders(orders) {
   const container = document.getElementById("pickup-orders");
@@ -893,8 +904,7 @@ function renderPickupOrders(orders) {
 
   container.querySelectorAll(".pickup-pay").forEach((btn) => {
     btn.addEventListener("click", () => {
-      document.getElementById("qr-modal").classList.add("is-open");
-      document.body.style.overflow = "hidden";
+      payWithStripe(btn.dataset.orderId);
     });
   });
 }
