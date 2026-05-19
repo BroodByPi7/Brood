@@ -177,8 +177,8 @@ document.querySelector(".admin-save-limits").addEventListener("click", () => {
   const maxPerDay = parseInt(document.getElementById("limit-perday").value, 10) || 50;
   const items = {};
   document.querySelectorAll(".limit-item-input").forEach((input) => {
-    const val = parseInt(input.value, 10);
-    if (val > 0) items[input.dataset.name] = { max: val };
+    const qty = parseInt(input.value, 10);
+    items[input.dataset.name] = { max: Number.isFinite(qty) ? Math.max(0, qty) : 0 };
   });
 
   if (typeof saveLimits === "function") {

@@ -57,6 +57,24 @@ body {
   opacity: 0.6;
 }
 
+.admin-header-links {
+  margin-left: auto;
+  margin-right: 1rem;
+}
+
+.admin-back-link {
+  color: var(--paper);
+  opacity: 0.7;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: opacity 120ms;
+}
+
+.admin-back-link:hover {
+  opacity: 1;
+}
+
 .admin-nav {
   display: flex;
   gap: 0.25rem;
