@@ -1,4 +1,5 @@
 const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 
@@ -108,5 +109,37 @@ exports.omiseWebhook = onRequest(
     }
 
     res.status(200).send("OK");
+  }
+);
+
+/**
+ * Daily at midnight (Asia/Bangkok), archive confirmed/paid orders
+ * whose pickup date has passed.
+ */
+exports.dailyArchiveOrders = onSchedule(
+  { schedule: "0 0 * * *", timeZone: "Asia/Bangkok" },
+  async () => {
+    const today = new Date();
+    const todayStr = today.getFullYear() + "-"
+      + String(today.getMonth() + 1).padStart(2, "0") + "-"
+      + String(today.getDate()).padStart(2, "0");
+
+    const snap = await db.collection("orders")
+      .where("status", "in", ["confirmed", "paid"])
+      .get();
+
+    let count = 0;
+    const batch = db.batch();
+
+    snap.forEach((doc) => {
+      const data = doc.data();
+      if (data.date && data.date < todayStr) {
+        batch.update(doc.ref, { status: "archived", archivedAt: admin.firestore.FieldValue.serverTimestamp() });
+        count++;
+      }
+    });
+
+    if (count > 0) await batch.commit();
+    console.log("Archived " + count + " orders at midnight.");
   }
 );

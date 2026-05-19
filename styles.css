@@ -1501,6 +1501,7 @@ p {
 .account-order-status.confirmed { color: var(--green); }
 .account-order-status.declined { color: var(--red); }
 .account-order-status.cancelled { color: #757575; }
+.account-order-status.archived { color: #757575; }
 
 .account-order-total {
   font-weight: 700;

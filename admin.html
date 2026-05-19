@@ -22,6 +22,7 @@
       </div>
       <nav class="admin-nav">
         <button class="admin-nav-btn is-active" data-tab="orders">Orders</button>
+        <button class="admin-nav-btn" data-tab="archived">Archived</button>
         <button class="admin-nav-btn" data-tab="pricing">Pricing</button>
         <button class="admin-nav-btn" data-tab="limits">Limits</button>
       </nav>
@@ -55,6 +56,19 @@
       </div>
       <div class="orders-list" id="orders-list">
         <p class="admin-empty">No orders yet.</p>
+      </div>
+    </section>
+
+    <!-- Archived tab -->
+    <section class="admin-tab" id="tab-archived">
+      <div class="admin-tab-head">
+        <h2>Archived orders</h2>
+        <div class="admin-filters">
+          <input type="date" id="archived-filter-date">
+        </div>
+      </div>
+      <div class="orders-list" id="archived-list">
+        <p class="admin-empty">No archived orders.</p>
       </div>
     </section>
 

@@ -297,6 +297,22 @@ body {
   color: var(--paper);
 }
 
+.btn-archive {
+  color: #1565c0;
+  border-color: #1565c0;
+  background: transparent;
+}
+
+.btn-archive:hover {
+  background: #1565c0;
+  color: var(--paper);
+}
+
+.order-card-status.archived {
+  color: #757575;
+  background: #f5f5f5;
+}
+
 .btn-delete {
   color: var(--muted);
   border-color: var(--line);

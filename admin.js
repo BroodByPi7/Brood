@@ -71,7 +71,7 @@ function initAdmin() {
   }
 }
 
-// ── Render orders ───────────────────────────────────────────────────────────
+// ── Render orders (non-archived) ────────────────────────────────────────────
 
 const statusFilter = document.getElementById("order-filter-status");
 const dateFilter = document.getElementById("order-filter-date");
@@ -82,6 +82,7 @@ function renderOrders() {
   const date = dateFilter.value;
 
   const filtered = allOrders.filter((o) => {
+    if (o.status === "archived") return false;
     if (status !== "all" && o.status !== status) return false;
     if (date && o.date !== date) return false;
     return true;
@@ -114,10 +115,11 @@ function renderOrders() {
         <div style="font-weight:700;color:var(--brood-blue)">$${(o.total || 0).toFixed(2)}</div>
         ${o.notes ? `<div class="order-card-notes">${escapeHtml(o.notes)}</div>` : ""}
         <div class="order-card-actions">
-          ${o.status !== "confirmed" && o.status !== "paid" ? `<button class="btn-confirm" data-id="${o.id}">Confirm</button>` : ""}
+          ${o.status !== "confirmed" && o.status !== "paid" && o.status !== "cancelled" ? `<button class="btn-confirm" data-id="${o.id}">Confirm</button>` : ""}
           ${o.status === "confirmed" ? `<button class="btn-markpaid" data-id="${o.id}">Mark paid</button>` : ""}
           ${o.status !== "declined" && o.status !== "paid" && o.status !== "cancelled" ? `<button class="btn-decline" data-id="${o.id}">Decline</button>` : ""}
-          ${o.status !== "cancelled" ? `<button class="btn-cancel" data-id="${o.id}">Cancel</button>` : ""}
+          ${o.status === "paid" ? `<button class="btn-archive" data-id="${o.id}">Archive</button>` : ""}
+          ${o.status !== "paid" && o.status !== "cancelled" ? `<button class="btn-cancel" data-id="${o.id}">Cancel</button>` : ""}
         </div>
       </div>
     `;
@@ -150,6 +152,15 @@ function renderOrders() {
     });
   });
 
+  document.querySelectorAll(".btn-archive").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (typeof updateOrderStatus === "function") {
+        updateOrderStatus(btn.dataset.id, "archived");
+        showToast("Order archived");
+      }
+    });
+  });
+
   document.querySelectorAll(".btn-cancel").forEach((btn) => {
     btn.addEventListener("click", () => {
       if (typeof updateOrderStatus === "function") {
@@ -160,6 +171,51 @@ function renderOrders() {
   });
 }
 
+// ── Archived orders ─────────────────────────────────────────────────────────
+
+const archivedDateFilter = document.getElementById("archived-filter-date");
+
+function renderArchived() {
+  const list = document.getElementById("archived-list");
+  const date = archivedDateFilter.value;
+
+  const filtered = allOrders.filter((o) => {
+    if (o.status !== "archived") return false;
+    if (date && o.date !== date) return false;
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<p class="admin-empty">No archived orders.</p>';
+    return;
+  }
+
+  list.innerHTML = filtered.map((o) => {
+    const itemsHtml = (o.items || []).map((item) =>
+      `<div><span>${item.qty}×</span> ${item.name}${item.type ? " (" + item.type + ")" : ""}</div>`
+    ).join("");
+
+    return `
+      <div class="order-card" data-id="${o.id}">
+        <div class="order-card-header">
+          <div>
+            <span class="order-card-date">${o.date}</span>
+            <span class="order-card-id">#${o.id ? o.id.slice(-6) : "---"}</span>
+          </div>
+          <div>
+            <span class="order-card-status archived">archived</span>
+            ${o.time ? `<span style="margin-left:0.5rem;font-size:0.85rem;color:var(--muted)">${o.time}</span>` : ""}
+          </div>
+        </div>
+        <div class="order-card-contact">${o.customerName || "?"} — ${o.customerContact || "?"}</div>
+        <div class="order-card-items">${itemsHtml}</div>
+        <div style="font-weight:700;color:var(--brood-blue)">$${(o.total || 0).toFixed(2)}</div>
+        ${o.notes ? `<div class="order-card-notes">${escapeHtml(o.notes)}</div>` : ""}
+      </div>
+    `;
+  }).join("");
+}
+
 function escapeHtml(s) {
   const d = document.createElement("div");
   d.textContent = s;
@@ -168,6 +224,7 @@ function escapeHtml(s) {
 
 statusFilter.addEventListener("change", renderOrders);
 dateFilter.addEventListener("change", renderOrders);
+archivedDateFilter.addEventListener("change", renderArchived);
 
 // ── Limits ──────────────────────────────────────────────────────────────────
 
@@ -252,6 +309,7 @@ document.querySelectorAll(".admin-nav-btn").forEach((btn) => {
     btn.classList.add("is-active");
     document.querySelectorAll(".admin-tab").forEach((t) => t.classList.remove("is-active"));
     document.getElementById("tab-" + btn.dataset.tab).classList.add("is-active");
+    if (btn.dataset.tab === "archived") renderArchived();
   });
 });
 

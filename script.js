@@ -910,7 +910,7 @@ function renderPickupOrders(orders) {
     container.innerHTML = '<p class="pickup-empty">No orders yet.</p>';
     return;
   }
-  const visible = orders.filter((o) => o.status !== "cancelled");
+  const visible = orders.filter((o) => o.status !== "cancelled" && o.status !== "archived");
   if (visible.length === 0) {
     container.innerHTML = '<p class="pickup-empty">No orders yet.</p>';
     return;
