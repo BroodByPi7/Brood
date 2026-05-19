@@ -938,7 +938,7 @@ async function sendOrderEmail(order) {
   if (!EMAILJS_CONFIG.publicKey || EMAILJS_CONFIG.publicKey === "your_public_key") return;
   const items = (order.items || []).map((i) => `${i.qty}× ${i.name}${i.type ? " (" + i.type + ")" : ""}`).join(", ");
   try {
-    await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+    const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -946,6 +946,7 @@ async function sendOrderEmail(order) {
         template_id: EMAILJS_CONFIG.templateId,
         user_id: EMAILJS_CONFIG.publicKey,
         template_params: {
+          to_email: order.customerContact || "",
           customer_name: order.customerName || order.customerContact || "Valued customer",
           date: order.date || "",
           time: order.time || "",
@@ -955,6 +956,10 @@ async function sendOrderEmail(order) {
         },
       }),
     });
+    if (!res.ok) {
+      const text = await res.text();
+      console.warn("EmailJS error:", res.status, text);
+    }
   } catch (e) {
     console.warn("Email send failed:", e);
   }
