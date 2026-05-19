@@ -694,7 +694,12 @@ function setupAuth() {
       }
     } else {
       userBtn.setAttribute("aria-label", "Sign in");
-      userBtn.onclick = openAuthModal;
+userBtn.onclick = openAuthModal;
+
+document.querySelector(".basket-checkout")?.addEventListener("click", () => {
+  closeBasket();
+  document.getElementById("order")?.scrollIntoView({ behavior: "smooth" });
+});
       if (adminLinkBelow) adminLinkBelow.style.display = "none";
     }
   });
