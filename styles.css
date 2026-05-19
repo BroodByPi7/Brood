@@ -694,6 +694,21 @@ p {
 .details-section,
 .about-section {
   background: var(--paper);
+  position: relative;
+  overflow: hidden;
+}
+
+.about-bg {
+  position: absolute;
+  inset: 0;
+  background: url("Images/Logo.png") center / contain no-repeat;
+  opacity: 0.06;
+  pointer-events: none;
+}
+
+.about-text {
+  position: relative;
+  z-index: 1;
 }
 
 .detail-grid {
