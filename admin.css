@@ -205,6 +205,11 @@ body {
   background: #ffebee;
 }
 
+.order-card-status.paid {
+  color: #1565c0;
+  background: #e3f2fd;
+}
+
 .order-card-items {
   font-size: 0.9rem;
   color: var(--ink);
@@ -262,6 +267,17 @@ body {
 
 .btn-decline:hover {
   background: var(--red);
+  color: var(--paper);
+}
+
+.btn-markpaid {
+  color: #1565c0;
+  border-color: #1565c0;
+  background: transparent;
+}
+
+.btn-markpaid:hover {
+  background: #1565c0;
   color: var(--paper);
 }
 

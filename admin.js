@@ -114,8 +114,9 @@ function renderOrders() {
         <div style="font-weight:700;color:var(--brood-blue)">$${(o.total || 0).toFixed(2)}</div>
         ${o.notes ? `<div class="order-card-notes">${escapeHtml(o.notes)}</div>` : ""}
         <div class="order-card-actions">
-          ${o.status !== "confirmed" ? `<button class="btn-confirm" data-id="${o.id}">Confirm</button>` : ""}
-          ${o.status !== "declined" ? `<button class="btn-decline" data-id="${o.id}">Decline</button>` : ""}
+          ${o.status !== "confirmed" && o.status !== "paid" ? `<button class="btn-confirm" data-id="${o.id}">Confirm</button>` : ""}
+          ${o.status === "confirmed" ? `<button class="btn-markpaid" data-id="${o.id}">Mark paid</button>` : ""}
+          ${o.status !== "declined" && o.status !== "paid" ? `<button class="btn-decline" data-id="${o.id}">Decline</button>` : ""}
           <button class="btn-delete" data-id="${o.id}">Delete</button>
         </div>
       </div>
@@ -136,6 +137,15 @@ function renderOrders() {
       if (typeof updateOrderStatus === "function") {
         updateOrderStatus(btn.dataset.id, "declined");
         showToast("Order declined");
+      }
+    });
+  });
+
+  document.querySelectorAll(".btn-markpaid").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (typeof updateOrderStatus === "function") {
+        updateOrderStatus(btn.dataset.id, "paid");
+        showToast("Order marked paid");
       }
     });
   });

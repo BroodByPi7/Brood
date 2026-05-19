@@ -859,6 +859,8 @@ function setupPickupOrders(user) {
   });
 }
 
+let payingOrderId = null;
+
 function renderPickupOrders(orders) {
   const container = document.getElementById("pickup-orders");
   if (!container) return;
@@ -870,7 +872,6 @@ function renderPickupOrders(orders) {
     const itemsHtml = (o.items || []).map((i) =>
       `<span class="pickup-item">${i.qty}× ${i.name}${i.type ? " (" + i.type + ")" : ""}</span>`
     ).join(", ");
-    const canPay = o.status === "confirmed";
     return `
       <div class="pickup-card ${o.status}">
         <div class="pickup-card-top">
@@ -882,8 +883,11 @@ function renderPickupOrders(orders) {
         </div>
         <div class="pickup-items">${itemsHtml}</div>
         <div class="pickup-card-bottom">
-          <span class="pickup-total">${formatPrice(o.total)}</span>
-          ${canPay ? `<button class="pickup-pay" data-order-id="${o.id}">Pay</button>` : ""}
+          ${o.status === "paid"
+            ? `<div class="pickup-thanks">Thanks for ordering with Brood! See you on ${o.date} ${o.time ? "at " + o.time : ""}.</div>`
+            : `<span class="pickup-total">${formatPrice(o.total)}</span>
+               ${o.status === "confirmed" ? `<button class="pickup-pay" data-order-id="${o.id}">Pay</button>` : ""}`
+          }
         </div>
       </div>
     `;
@@ -891,6 +895,7 @@ function renderPickupOrders(orders) {
 
   container.querySelectorAll(".pickup-pay").forEach((btn) => {
     btn.addEventListener("click", () => {
+      payingOrderId = btn.dataset.orderId;
       document.getElementById("qr-modal").classList.add("is-open");
       document.body.style.overflow = "hidden";
     });
@@ -906,6 +911,17 @@ document.addEventListener("click", (e) => {
     modal.classList.remove("is-open");
     document.body.style.overflow = "";
   }
+});
+
+document.getElementById("qr-confirm")?.addEventListener("click", () => {
+  if (!payingOrderId || typeof updateOrderStatus !== "function") return;
+  updateOrderStatus(payingOrderId, "paid")
+    .then(() => {
+      document.getElementById("qr-modal").classList.remove("is-open");
+      document.body.style.overflow = "";
+      payingOrderId = null;
+    })
+    .catch((err) => alert("Payment failed: " + (err.message || err)));
 });
 
 // ── Icon color flip on dark sections ──────────────────────────────────────────
