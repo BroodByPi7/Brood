@@ -722,10 +722,28 @@ function setupAuth() {
         loadUserOrders(user.uid);
       };
       getUserProfile(user.uid).then((profile) => {
-        const pname = profile && profile.name ? profile.name : user.displayName;
-        document.getElementById("account-name").textContent = pname || user.email;
-        if (pname) {
-          document.getElementById("order-name").value = pname;
+        if (profile && profile.name) {
+          document.getElementById("account-name").textContent = profile.name;
+          document.getElementById("order-name").value = profile.name;
+          if (!user.displayName && typeof user.updateProfile === "function") {
+            user.updateProfile({ displayName: profile.name });
+          }
+        } else if (user.displayName) {
+          document.getElementById("account-name").textContent = user.displayName;
+          document.getElementById("order-name").value = user.displayName;
+          if (!profile && typeof setUserProfile === "function") {
+            setUserProfile(user.uid, { email: user.email, name: user.displayName });
+          }
+        } else {
+          const fallback = user.email.split("@")[0];
+          document.getElementById("account-name").textContent = fallback;
+          if (typeof setUserProfile === "function") {
+            setUserProfile(user.uid, { email: user.email, name: fallback });
+          }
+          if (typeof user.updateProfile === "function") {
+            user.updateProfile({ displayName: fallback });
+          }
+          document.getElementById("order-name").value = fallback;
         }
       });
       document.getElementById("order-contact").value = user.email;
