@@ -618,17 +618,24 @@ authModal.querySelector(".auth-close").addEventListener("click", closeAuthModal)
 
 userBtn.onclick = openAuthModal;
 
+function syncAuthTab(tab) {
+  document.querySelectorAll(".auth-tab").forEach((t) => t.classList.remove("is-active"));
+  tab.classList.add("is-active");
+  currentTab = tab.dataset.tab;
+  const loginFields = document.getElementById("auth-fields-login");
+  const signupFields = document.getElementById("auth-fields-signup");
+  loginFields.style.display = currentTab === "login" ? "" : "none";
+  signupFields.style.display = currentTab === "signup" ? "" : "none";
+  loginFields.querySelectorAll("[required]").forEach((el) => el.required = currentTab === "login");
+  signupFields.querySelectorAll("[required]").forEach((el) => el.required = currentTab === "signup");
+  document.querySelector(".auth-submit").textContent = currentTab === "login" ? "Sign in" : "Create account";
+  document.getElementById("auth-error").textContent = "";
+}
+
 document.querySelectorAll(".auth-tab").forEach((tab) => {
-  tab.addEventListener("click", () => {
-    document.querySelectorAll(".auth-tab").forEach((t) => t.classList.remove("is-active"));
-    tab.classList.add("is-active");
-    currentTab = tab.dataset.tab;
-    document.getElementById("auth-fields-login").style.display = currentTab === "login" ? "" : "none";
-    document.getElementById("auth-fields-signup").style.display = currentTab === "signup" ? "" : "none";
-    document.querySelector(".auth-submit").textContent = currentTab === "login" ? "Sign in" : "Create account";
-    document.getElementById("auth-error").textContent = "";
-  });
+  tab.addEventListener("click", () => syncAuthTab(tab));
 });
+syncAuthTab(document.querySelector(".auth-tab.is-active"));
 
 document.getElementById("auth-form").addEventListener("submit", async (e) => {
   e.preventDefault();
