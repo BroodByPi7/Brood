@@ -816,6 +816,7 @@ function setupAuth() {
       });
       document.getElementById("order-contact").value = user.email;
       refreshWarnings();
+      setupPickupOrders(user);
       if (adminLinkBelow && user.email === "broodbypi7@gmail.com") {
         adminLinkBelow.style.display = "";
       } else if (adminLinkBelow) {
@@ -827,6 +828,9 @@ function setupAuth() {
       if (adminLinkBelow) adminLinkBelow.style.display = "none";
       document.getElementById("order-contact").value = "";
       document.getElementById("order-name").value = "";
+      if (unsubPickupOrders) { unsubPickupOrders(); unsubPickupOrders = null; }
+      const container = document.getElementById("pickup-orders");
+      if (container) container.innerHTML = '<p class="pickup-empty">Sign in to view your orders.</p>';
       refreshWarnings();
     }
   });
@@ -837,6 +841,72 @@ function onReady() {
 }
 if (typeof onAuthChanged === "function") onReady();
 else document.addEventListener("DOMContentLoaded", onReady);
+
+// ── Pickup section ───────────────────────────────────────────────────────────
+
+let unsubPickupOrders = null;
+
+function setupPickupOrders(user) {
+  const container = document.getElementById("pickup-orders");
+  if (!container) return;
+  if (unsubPickupOrders) { unsubPickupOrders(); unsubPickupOrders = null; }
+  if (typeof getUserOrders !== "function") {
+    container.innerHTML = '<p class="pickup-empty">Sign in to view your orders.</p>';
+    return;
+  }
+  unsubPickupOrders = getUserOrders(user.uid, (orders) => {
+    renderPickupOrders(orders);
+  });
+}
+
+function renderPickupOrders(orders) {
+  const container = document.getElementById("pickup-orders");
+  if (!container) return;
+  if (orders.length === 0) {
+    container.innerHTML = '<p class="pickup-empty">No orders yet.</p>';
+    return;
+  }
+  container.innerHTML = orders.map((o) => {
+    const itemsHtml = (o.items || []).map((i) =>
+      `<span class="pickup-item">${i.qty}× ${i.name}${i.type ? " (" + i.type + ")" : ""}</span>`
+    ).join(", ");
+    const canPay = o.status === "confirmed";
+    return `
+      <div class="pickup-card ${o.status}">
+        <div class="pickup-card-top">
+          <div>
+            <span class="pickup-date">${o.date}</span>
+            ${o.time ? `<span class="pickup-time">${o.time}</span>` : ""}
+          </div>
+          <span class="pickup-status ${o.status}">${o.status}</span>
+        </div>
+        <div class="pickup-items">${itemsHtml}</div>
+        <div class="pickup-card-bottom">
+          <span class="pickup-total">${formatPrice(o.total)}</span>
+          ${canPay ? `<button class="pickup-pay" data-order-id="${o.id}">Pay</button>` : ""}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  container.querySelectorAll(".pickup-pay").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.getElementById("qr-modal").classList.add("is-open");
+      document.body.style.overflow = "hidden";
+    });
+  });
+}
+
+// ── QR modal ─────────────────────────────────────────────────────────────────
+
+document.addEventListener("click", (e) => {
+  const modal = document.getElementById("qr-modal");
+  if (!modal) return;
+  if (e.target === modal || e.target.closest("#qr-close")) {
+    modal.classList.remove("is-open");
+    document.body.style.overflow = "";
+  }
+});
 
 // ── Icon color flip on dark sections ──────────────────────────────────────────
 

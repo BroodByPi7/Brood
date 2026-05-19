@@ -292,25 +292,40 @@
     </section>
 
     <section class="section details-section" id="pickup" aria-labelledby="pickup-title">
-      <div class="section-heading">
+      <div class="section-heading narrow">
         <p class="eyebrow">Pickup</p>
-        <h2 id="pickup-title">Pickup details stay calm and clear</h2>
+        <h2 id="pickup-title">Your orders</h2>
+        <p>Track your orders, confirm status, and complete payment.</p>
       </div>
-      <div class="detail-grid">
-        <article>
-          <h3>Pickup windows</h3>
-          <p>Use fixed pickup windows once the calendar is added, with daily bakes separated from longer preorder items.</p>
-        </article>
-        <article>
-          <h3>Delivery notes</h3>
-          <p>Delivery can be handled as a later confirmation step or by local zones after the first version is live.</p>
-        </article>
-        <article>
-          <h3>Limited bakes</h3>
-          <p>Sandwich loafs, matcha spiral shoku pans, and other limited items should be easy to mark as sold out.</p>
-        </article>
+      <div class="pickup-orders" id="pickup-orders">
+        <p class="pickup-empty">Sign in to view your orders.</p>
       </div>
     </section>
+
+    <div class="modal qr-modal" id="qr-modal" aria-label="Payment QR code" role="dialog">
+      <div class="modal-content">
+        <button class="modal-close" id="qr-close" aria-label="Close">&times;</button>
+        <h3>Scan to pay</h3>
+        <div class="qr-placeholder">
+          <svg viewBox="0 0 200 200" width="200" height="200">
+            <rect x="0" y="0" width="200" height="200" fill="white"/>
+            <rect x="20" y="20" width="40" height="40" fill="black"/>
+            <rect x="140" y="20" width="40" height="40" fill="black"/>
+            <rect x="20" y="140" width="40" height="40" fill="black"/>
+            <rect x="80" y="80" width="40" height="40" fill="black"/>
+            <rect x="60" y="20" width="10" height="40" fill="black"/>
+            <rect x="20" y="60" width="40" height="10" fill="black"/>
+            <rect x="140" y="60" width="40" height="10" fill="black"/>
+            <rect x="60" y="140" width="10" height="40" fill="black"/>
+            <rect x="100" y="20" width="10" height="20" fill="black"/>
+            <rect x="120" y="60" width="20" height="10" fill="black"/>
+            <rect x="140" y="100" width="20" height="10" fill="black"/>
+            <rect x="60" y="100" width="10" height="20" fill="black"/>
+          </svg>
+        </div>
+        <p class="qr-note">Placeholder — real payment integration coming soon.</p>
+      </div>
+    </div>
 
     <section class="section catering-section" id="catering" aria-labelledby="catering-title">
       <div class="section-heading narrow">

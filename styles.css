@@ -8,6 +8,9 @@
   --muted: #48618b;
   --line: rgba(7, 63, 158, 0.24);
   --max-width: 1120px;
+  --green: #1f7a3d;
+  --red: #c42b2b;
+  --amber: #b8860b;
   color: var(--ink);
   background: var(--paper);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -1533,4 +1536,160 @@ p {
 
 .account-signout:hover {
   background: var(--paper-warm);
+}
+
+/* ── Pickup section ──────────────────────────────────────────────────────── */
+
+.pickup-orders {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.pickup-empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+  padding: 2rem 0;
+}
+
+.pickup-card {
+  border: 2px solid var(--line);
+  padding: 0.85rem 1rem;
+  font-size: 0.88rem;
+}
+
+.pickup-card.pending {
+  border-left: 4px solid var(--amber);
+}
+
+.pickup-card.confirmed {
+  border-left: 4px solid var(--green);
+}
+
+.pickup-card.declined {
+  border-left: 4px solid var(--red);
+}
+
+.pickup-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pickup-date {
+  font-weight: 700;
+  color: var(--brood-blue);
+}
+
+.pickup-time {
+  margin-left: 0.5rem;
+  color: var(--muted);
+  font-size: 0.83rem;
+}
+
+.pickup-status {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pickup-status.pending { color: var(--amber); }
+.pickup-status.confirmed { color: var(--green); }
+.pickup-status.declined { color: var(--red); }
+
+.pickup-items {
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.83rem;
+}
+
+.pickup-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.pickup-total {
+  font-weight: 700;
+}
+
+.pickup-pay {
+  padding: 0.35rem 1rem;
+  font-size: 0.83rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--paper);
+  background: var(--green);
+  border: 2px solid var(--green);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pickup-pay:hover {
+  opacity: 0.85;
+}
+
+/* ── QR modal ────────────────────────────────────────────────────────────── */
+
+.qr-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms;
+}
+
+.qr-modal.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.qr-modal .modal-content {
+  background: var(--paper);
+  padding: 2rem;
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--brood-blue);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--brood-blue);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.qr-modal h3 {
+  margin-bottom: 1rem;
+}
+
+.qr-placeholder {
+  margin: 0 auto 0.75rem;
+}
+
+.qr-placeholder svg {
+  display: block;
+}
+
+.qr-note {
+  color: var(--muted);
+  font-size: 0.8rem;
 }
