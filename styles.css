@@ -705,7 +705,7 @@ p {
   transform: translate(-50%, -50%);
   height: 70%;
   width: auto;
-  opacity: 0.12;
+  opacity: 0.25;
   pointer-events: none;
 }
 
