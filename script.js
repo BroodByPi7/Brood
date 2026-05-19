@@ -33,7 +33,7 @@ const currencies = {
 let currentCurrency = localStorage.getItem("brood_currency") || "USD";
 
 function formatPrice(usdPrice) {
-  const c = currencies[currentCurrency];
+  const c = currencies[currentCurrency] || currencies.USD;
   return c.symbol + (usdPrice * c.rate).toFixed(2);
 }
 
