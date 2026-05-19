@@ -932,7 +932,7 @@ function showQrFallback() {
   const container = document.querySelector(".pickup-slideshow");
   if (!container) return;
   const count = 4;
-  const folder = "Images/shop/";
+  const folder = "Images/Shop/";
   for (let i = 0; i < count; i++) {
     const div = document.createElement("div");
     div.className = "slide-bg";
