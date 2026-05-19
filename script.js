@@ -616,7 +616,7 @@ function closeAuthModal() {
 authModal.querySelector(".auth-backdrop").addEventListener("click", closeAuthModal);
 authModal.querySelector(".auth-close").addEventListener("click", closeAuthModal);
 
-userBtn.addEventListener("click", openAuthModal);
+userBtn.onclick = openAuthModal;
 
 document.querySelectorAll(".auth-tab").forEach((tab) => {
   tab.addEventListener("click", () => {
