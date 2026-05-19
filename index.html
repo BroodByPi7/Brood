@@ -40,12 +40,22 @@
   </header>
 
   <div class="user-area" id="user-area">
-    <button class="user-btn" id="user-btn" type="button" aria-label="Sign in">
-      <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-        <circle cx="12" cy="7" r="4"/>
-      </svg>
-    </button>
+    <div class="user-area-icons">
+      <button class="user-btn" id="user-btn" type="button" aria-label="Sign in">
+        <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </button>
+      <button class="user-btn basket-icon-btn" id="basket-icon-btn" type="button" aria-label="Open basket">
+        <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <span class="basket-icon-count" id="basket-icon-count">0</span>
+      </button>
+    </div>
     <a href="admin.html" class="admin-link-below" id="admin-link-below" style="display:none">Admin</a>
   </div>
 

@@ -142,10 +142,9 @@ document.addEventListener("click", (event) => {
 
 const basket = [];
 const basketSidebar = document.querySelector(".basket-sidebar");
-const basketPanel = basketSidebar.querySelector(".basket-panel");
-const basketItems = basketSidebar.querySelector(".basket-items");
-const basketTotal = basketSidebar.querySelector(".total-price");
+const basketToggle = document.querySelector(".basket-toggle");
 const basketCount = document.querySelector(".basket-count");
+const basketIconCount = document.getElementById("basket-icon-count");
 const basketToggle = document.querySelector(".basket-toggle");
 
 function renderBasket() {
@@ -155,6 +154,7 @@ function renderBasket() {
     basketItems.innerHTML = '<p class="basket-empty">Your basket is empty</p>';
     basketTotal.textContent = formatPrice(0);
     basketCount.textContent = "0";
+    if (basketIconCount) basketIconCount.textContent = "0";
     basketToggle.classList.remove("is-visible");
     return;
   }
@@ -187,6 +187,7 @@ function renderBasket() {
 
   basketTotal.textContent = formatPrice(total);
   basketCount.textContent = count;
+  if (basketIconCount) basketIconCount.textContent = count;
   basketToggle.classList.add("is-visible");
 
   basketItems.querySelectorAll(".item-minus").forEach((btn) => {
@@ -519,6 +520,7 @@ function showOrderConfirmation(ref) {
 }
 
 function resetAfterOrder() {
+  if (orderSubmitBtn) orderSubmitBtn.disabled = false;
   basket.length = 0;
   renderBasket();
   orderForm.reset();
@@ -531,9 +533,11 @@ function resetAfterOrder() {
 }
 
 const orderForm = document.querySelector(".order-form");
+const orderSubmitBtn = orderForm?.querySelector(".order-submit");
 if (orderForm) {
   orderForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    if (orderSubmitBtn) orderSubmitBtn.disabled = true;
     const name = document.getElementById("order-name").value.trim();
     const contact = document.getElementById("order-contact").value.trim();
     const notes = document.getElementById("order-notes").value.trim();
@@ -541,20 +545,23 @@ if (orderForm) {
     const slot = document.querySelector(".slot-btn.is-selected");
     const time = slot ? slot.dataset.time : "";
 
-    if (!name || !contact) return;
+    if (!name || !contact) { if (orderSubmitBtn) orderSubmitBtn.disabled = false; return; }
 
     if (basket.length === 0) {
+      if (orderSubmitBtn) orderSubmitBtn.disabled = false;
       alert("Your basket is empty. Add items from the menu first.");
       return;
     }
 
     if (isDateFull(date)) {
+      if (orderSubmitBtn) orderSubmitBtn.disabled = false;
       alert("Sorry, this date is fully booked. Please choose another date.");
       return;
     }
 
     for (const item of basket) {
       if (isItemSoldOut(date, item.name)) {
+        if (orderSubmitBtn) orderSubmitBtn.disabled = false;
         alert(`Sorry, ${item.name} is sold out for this date.`);
         return;
       }
@@ -578,6 +585,7 @@ if (orderForm) {
         showOrderConfirmation(null);
         return;
       } catch (err) {
+        if (orderSubmitBtn) orderSubmitBtn.disabled = false;
         alert("Order failed: " + err.message);
         return;
       }
@@ -713,11 +721,25 @@ else { document.addEventListener("DOMContentLoaded", setupAuth); }
 
 loadPrices();
 
+// ── Icon color flip on dark sections ──────────────────────────────────────────
+
+const orderSection = document.getElementById("order");
+if (userArea && orderSection) {
+  function updateIconColors() {
+    const rect = orderSection.getBoundingClientRect();
+    userArea.classList.toggle("on-dark", rect.top <= 80 && rect.bottom >= 80);
+  }
+  window.addEventListener("scroll", updateIconColors, { passive: true });
+  updateIconColors();
+}
+
 document.querySelector(".basket-checkout")?.addEventListener("click", () => {
   closeBasket();
   const orderEl = document.getElementById("order");
   if (orderEl) setTimeout(() => orderEl.scrollIntoView({ behavior: "smooth" }), 250);
 });
+
+document.getElementById("basket-icon-btn")?.addEventListener("click", openBasket);
 
 accountPanel.querySelector(".account-backdrop").addEventListener("click", () => {
   accountPanel.classList.remove("is-open");

@@ -1183,6 +1183,32 @@ p {
   flex-shrink: 0;
 }
 
+.basket-icon-btn {
+  position: relative;
+}
+
+.basket-icon-count {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding: 0 0.25rem;
+  font-size: 0.6rem;
+  font-weight: 900;
+  font-family: inherit;
+  line-height: 1.1rem;
+  text-align: center;
+  color: var(--paper);
+  background: var(--brood-blue);
+  border-radius: 50%;
+}
+
+.user-area.on-dark .basket-icon-count {
+  color: var(--brood-blue);
+  background: var(--paper);
+}
+
 .admin-link-below {
   font-size: 0.6rem;
   font-weight: 700;
@@ -1200,6 +1226,23 @@ p {
 
 .admin-link-below:hover {
   opacity: 1;
+}
+
+.user-area.on-dark .user-btn {
+  color: var(--paper);
+}
+
+.user-area.on-dark .user-btn:hover {
+  background: var(--paper);
+  color: var(--brood-blue);
+}
+
+.user-area.on-dark .admin-link-below {
+  color: var(--paper);
+}
+
+.user-area.on-dark .admin-link-below:hover {
+  opacity: 0.8;
 }
 
 .currency-select {
