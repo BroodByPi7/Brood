@@ -530,19 +530,15 @@ function showOrderConfirmation(ref) {
 
 function resetAfterOrder() {
   if (orderSubmitBtn) orderSubmitBtn.disabled = false;
-  ["warn-name","warn-contact","warn-date","warn-slot"].forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = "";
-  });
   basket.length = 0;
   renderBasket();
   orderForm.reset();
-  pickupDate.value = document.querySelector(".cal-day.is-selected")
-    ? document.querySelector(".cal-day.is-selected").dataset.date
-    : (() => { const d = new Date(); d.setDate(d.getDate() + 1); return fmtDate(d.getFullYear(), d.getMonth(), d.getDate()); })();
+  pickupDate.value = "";
+  document.querySelectorAll(".slot-btn").forEach((b) => b.classList.remove("is-selected"));
   document.getElementById("order-name").focus();
   renderCalendar();
   updateBasketLimits();
+  refreshWarnings();
 }
 
 const orderForm = document.querySelector(".order-form");
