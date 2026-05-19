@@ -361,11 +361,10 @@ function fmtDate(y, m, d) {
   return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }
 
-document.querySelectorAll(".slot-btn").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".slot-btn").forEach((b) => b.classList.remove("is-selected"));
-    btn.classList.add("is-selected");
-  });
+const pickupTime = document.getElementById("pickup-time");
+pickupTime.addEventListener("change", () => {
+  const warnSlot = document.getElementById("warn-slot");
+  if (warnSlot) warnSlot.textContent = pickupTime.value ? "" : "Select a time";
 });
 
 // ── Order storage and limits ────────────────────────────────────────────────
@@ -534,7 +533,7 @@ function resetAfterOrder() {
   renderBasket();
   document.getElementById("order-notes").value = "";
   pickupDate.value = "";
-  document.querySelectorAll(".slot-btn").forEach((b) => b.classList.remove("is-selected"));
+  document.getElementById("pickup-time").value = "";
   document.getElementById("order-name").focus();
   renderCalendar();
   updateBasketLimits();
@@ -547,8 +546,7 @@ function validateOrder() {
   const name = document.getElementById("order-name").value.trim();
   const contact = document.getElementById("order-email").value.trim();
   const date = pickupDate ? pickupDate.value : "";
-  const slot = document.querySelector(".slot-btn.is-selected");
-  const time = slot ? slot.dataset.time : "";
+  const time = document.getElementById("pickup-time").value;
   const warnName = document.getElementById("warn-name");
   const warnContact = document.getElementById("warn-email");
   const warnDate = document.getElementById("warn-date");
@@ -560,7 +558,7 @@ function validateOrder() {
     { ok: !!name, warn: warnName, msg: "Enter your name", focus: document.getElementById("order-name") },
     { ok: !!contact, warn: warnContact, msg: "Enter your email", focus: document.getElementById("order-email") },
     { ok: !!date, warn: warnDate, msg: "Pick a date", focus: document.getElementById("calendar-widget") },
-    { ok: !!time, warn: warnSlot, msg: "Pick a time slot", focus: slot || document.querySelector(".slot-btn") },
+    { ok: !!time, warn: warnSlot, msg: "Select a time", focus: document.getElementById("pickup-time") },
   ];
 
   let firstEl = null;
@@ -598,7 +596,7 @@ function refreshWarnings() {
   const warnDate = document.getElementById("warn-date");
   if (warnDate) warnDate.textContent = pickupDate && pickupDate.value ? "" : "Pick a date";
   const warnSlot = document.getElementById("warn-slot");
-  if (warnSlot) warnSlot.textContent = document.querySelector(".slot-btn.is-selected") ? "" : "Pick a time slot";
+  if (warnSlot) warnSlot.textContent = document.getElementById("pickup-time").value ? "" : "Select a time";
 }
 
 function showLiveWarnings() {
@@ -619,14 +617,12 @@ function showLiveWarnings() {
       if (w) w.textContent = pickupDate && pickupDate.value ? "" : "Pick a date";
     });
   }
-  // Update slot warning on click
+  // Update slot warning on change
   const warnSlot = document.getElementById("warn-slot");
   if (warnSlot) {
-    warnSlot.textContent = document.querySelector(".slot-btn.is-selected") ? "" : "Pick a time slot";
-    document.querySelectorAll(".slot-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        warnSlot.textContent = document.querySelector(".slot-btn.is-selected") ? "" : "Pick a time slot";
-      });
+    warnSlot.textContent = document.getElementById("pickup-time").value ? "" : "Select a time";
+    document.getElementById("pickup-time").addEventListener("change", () => {
+      warnSlot.textContent = document.getElementById("pickup-time").value ? "" : "Select a time";
     });
   }
 }
@@ -638,8 +634,7 @@ if (orderForm) {
 
     const notes = document.getElementById("order-notes").value.trim();
     const date = pickupDate ? pickupDate.value : "";
-    const slot = document.querySelector(".slot-btn.is-selected");
-    const time = slot ? slot.dataset.time : "";
+    const time = document.getElementById("pickup-time").value;
 
     const { valid, firstEl } = validateOrder();
     if (!valid) {

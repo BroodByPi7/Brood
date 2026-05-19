@@ -577,32 +577,17 @@ p {
   color: var(--paper);
 }
 
-.slot-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-}
-
-.slot-btn {
-  padding: 0.65rem 0.5rem;
-  font-size: 0.95rem;
-  font-weight: 700;
+.order-select {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  font-size: 1rem;
   font-family: inherit;
-  color: var(--brood-blue);
-  background: rgba(255, 254, 251, 0.92);
-  border: 2px solid var(--paper);
+  color: var(--ink);
+  background: var(--paper);
+  border: 0;
+  border-radius: 0;
   cursor: pointer;
-  transition: background 120ms, color 120ms;
-}
-
-.slot-btn:hover {
-  background: var(--paper);
-}
-
-.slot-btn.is-selected {
-  background: var(--paper);
-  color: var(--brood-blue-dark);
-  border-color: var(--brood-blue-dark);
+  box-sizing: border-box;
 }
 
 .order-form {
@@ -622,6 +607,7 @@ p {
 }
 
 .order-form input,
+.order-form select,
 .order-form textarea {
   width: 100%;
   padding: 0.65rem 0.75rem;
@@ -634,6 +620,7 @@ p {
 }
 
 .order-form input:focus,
+.order-form select:focus,
 .order-form textarea:focus {
   outline: 2px solid var(--paper);
   outline-offset: 2px;
