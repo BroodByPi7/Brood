@@ -314,7 +314,10 @@ function getOrders() {
 }
 
 function getLimits() {
-  try { return JSON.parse(localStorage.getItem("brood_limits")); } catch {}
+  try {
+    const val = JSON.parse(localStorage.getItem("brood_limits"));
+    if (val && typeof val === "object") return val;
+  } catch {}
   return { maxPerDay: 50, items: {} };
 }
 
@@ -601,7 +604,8 @@ document.getElementById("auth-form").addEventListener("submit", async (e) => {
 
 // ── Auth state ──────────────────────────────────────────────────────────────
 
-if (typeof onAuthChanged === "function") {
+function setupAuth() {
+  if (typeof onAuthChanged !== "function") return;
   onAuthChanged((user) => {
     if (user) {
       navAuthBtn.textContent = "My account";
@@ -619,6 +623,8 @@ if (typeof onAuthChanged === "function") {
     }
   });
 }
+if (typeof onAuthChanged === "function") { setupAuth(); }
+else { document.addEventListener("DOMContentLoaded", setupAuth); }
 
 accountPanel.querySelector(".account-backdrop").addEventListener("click", () => {
   accountPanel.classList.remove("is-open");
