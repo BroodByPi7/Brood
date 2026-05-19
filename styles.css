@@ -573,8 +573,15 @@ p {
 .order-slots-label {
   font-weight: 850;
   font-size: 1.05rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   color: var(--paper);
+}
+
+.order-slots-sub {
+  font-size: 0.85rem;
+  color: rgba(255, 254, 251, 0.75);
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
 }
 
 .order-select {
