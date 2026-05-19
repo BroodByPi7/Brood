@@ -910,7 +910,12 @@ function renderPickupOrders(orders) {
     container.innerHTML = '<p class="pickup-empty">No orders yet.</p>';
     return;
   }
-  container.innerHTML = orders.map((o) => {
+  const visible = orders.filter((o) => o.status !== "cancelled");
+  if (visible.length === 0) {
+    container.innerHTML = '<p class="pickup-empty">No orders yet.</p>';
+    return;
+  }
+  container.innerHTML = visible.map((o) => {
     const itemsHtml = (o.items || []).map((i) =>
       `<span class="pickup-item">${i.qty}× ${i.name}${i.type ? " (" + i.type + ")" : ""}</span>`
     ).join(", ");

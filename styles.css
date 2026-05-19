@@ -1500,6 +1500,7 @@ p {
 .account-order-status.pending { color: var(--amber); }
 .account-order-status.confirmed { color: var(--green); }
 .account-order-status.declined { color: var(--red); }
+.account-order-status.cancelled { color: #757575; }
 
 .account-order-total {
   font-weight: 700;
@@ -1710,4 +1711,12 @@ p {
 
 .pickup-status.paid {
   color: #1565c0;
+}
+
+.pickup-status.cancelled {
+  color: #757575;
+}
+
+.pickup-card.cancelled {
+  border-left: 4px solid #757575;
 }

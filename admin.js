@@ -116,8 +116,8 @@ function renderOrders() {
         <div class="order-card-actions">
           ${o.status !== "confirmed" && o.status !== "paid" ? `<button class="btn-confirm" data-id="${o.id}">Confirm</button>` : ""}
           ${o.status === "confirmed" ? `<button class="btn-markpaid" data-id="${o.id}">Mark paid</button>` : ""}
-          ${o.status !== "declined" && o.status !== "paid" ? `<button class="btn-decline" data-id="${o.id}">Decline</button>` : ""}
-          <button class="btn-delete" data-id="${o.id}">Delete</button>
+          ${o.status !== "declined" && o.status !== "paid" && o.status !== "cancelled" ? `<button class="btn-decline" data-id="${o.id}">Decline</button>` : ""}
+          ${o.status !== "cancelled" ? `<button class="btn-cancel" data-id="${o.id}">Cancel</button>` : ""}
         </div>
       </div>
     `;
@@ -150,11 +150,11 @@ function renderOrders() {
     });
   });
 
-  document.querySelectorAll(".btn-delete").forEach((btn) => {
+  document.querySelectorAll(".btn-cancel").forEach((btn) => {
     btn.addEventListener("click", () => {
-      if (typeof deleteOrder === "function") {
-        deleteOrder(btn.dataset.id);
-        showToast("Order deleted");
+      if (typeof updateOrderStatus === "function") {
+        updateOrderStatus(btn.dataset.id, "cancelled");
+        showToast("Order cancelled");
       }
     });
   });
