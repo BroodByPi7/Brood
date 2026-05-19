@@ -599,8 +599,7 @@ if (orderForm) {
 
 const authModal = document.getElementById("auth-modal");
 const userBtn = document.getElementById("user-btn");
-const userBtnLabel = document.getElementById("user-btn-label");
-const adminLinkTop = document.getElementById("admin-link-top");
+const adminLinkBelow = document.getElementById("admin-link-below");
 const accountPanel = document.getElementById("account-panel");
 let currentTab = "login";
 
@@ -672,7 +671,7 @@ function setupAuth() {
   if (typeof onAuthChanged !== "function") return;
   onAuthChanged((user) => {
     if (user) {
-      userBtnLabel.textContent = "My account";
+      userBtn.setAttribute("aria-label", "My account");
       userBtn.onclick = () => {
         accountPanel.classList.add("is-open");
         document.body.style.overflow = "hidden";
@@ -681,15 +680,15 @@ function setupAuth() {
       getUserProfile(user.uid).then((profile) => {
         document.getElementById("account-name").textContent = profile ? profile.name : user.email;
       });
-      if (adminLinkTop && user.email === "broodbypi7@gmail.com") {
-        adminLinkTop.style.display = "";
-      } else if (adminLinkTop) {
-        adminLinkTop.style.display = "none";
+      if (adminLinkBelow && user.email === "broodbypi7@gmail.com") {
+        adminLinkBelow.style.display = "";
+      } else if (adminLinkBelow) {
+        adminLinkBelow.style.display = "none";
       }
     } else {
-      userBtnLabel.textContent = "Sign in";
+      userBtn.setAttribute("aria-label", "Sign in");
       userBtn.onclick = openAuthModal;
-      if (adminLinkTop) adminLinkTop.style.display = "none";
+      if (adminLinkBelow) adminLinkBelow.style.display = "none";
     }
   });
 }

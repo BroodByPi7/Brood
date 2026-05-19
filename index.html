@@ -39,15 +39,15 @@
     </nav>
   </header>
 
-  <button class="user-btn" id="user-btn" type="button" aria-label="Account">
-    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-      <circle cx="12" cy="7" r="4"/>
-    </svg>
-    <span id="user-btn-label">Sign in</span>
-  </button>
-
-  <a href="admin.html" class="admin-link-top" id="admin-link-top" style="display:none">Admin</a>
+  <div class="user-area" id="user-area">
+    <button class="user-btn" id="user-btn" type="button" aria-label="Sign in">
+      <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+    </button>
+    <a href="admin.html" class="admin-link-below" id="admin-link-below" style="display:none">Admin</a>
+  </div>
 
   <main>
     <section class="frontpage" aria-labelledby="frontpage-title">

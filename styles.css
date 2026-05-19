@@ -1148,25 +1148,28 @@ p {
 
 /* ── Admin link ───────────────────────── */
 
-.user-btn {
+.user-area {
   position: fixed;
   top: 0.65rem;
   right: 0.65rem;
   z-index: 100;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.4rem 0.7rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  font-family: inherit;
+}
+
+.user-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
   color: var(--brood-blue);
   background: transparent;
   border: 2px solid transparent;
   cursor: pointer;
   transition: background 120ms, color 120ms;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .user-btn:hover {
@@ -1175,17 +1178,13 @@ p {
 }
 
 .user-icon {
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 1.3rem;
+  height: 1.3rem;
   flex-shrink: 0;
 }
 
-.admin-link-top {
-  position: fixed;
-  top: 0.75rem;
-  right: 7.5rem;
-  z-index: 100;
-  font-size: 0.7rem;
+.admin-link-below {
+  font-size: 0.6rem;
   font-weight: 700;
   font-family: inherit;
   text-transform: uppercase;
@@ -1193,12 +1192,13 @@ p {
   color: var(--brood-blue);
   opacity: 0.5;
   text-decoration: none;
-  padding: 0.25rem 0.5rem;
-  border: 2px solid transparent;
+  padding: 0.15rem 0.3rem;
+  margin-top: 0.1rem;
   transition: opacity 120ms;
+  white-space: nowrap;
 }
 
-.admin-link-top:hover {
+.admin-link-below:hover {
   opacity: 1;
 }
 
