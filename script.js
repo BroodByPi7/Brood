@@ -722,9 +722,10 @@ function setupAuth() {
         loadUserOrders(user.uid);
       };
       getUserProfile(user.uid).then((profile) => {
-        document.getElementById("account-name").textContent = profile ? profile.name : user.email;
-        if (profile && profile.name) {
-          document.getElementById("order-name").value = profile.name;
+        const pname = profile && profile.name ? profile.name : user.displayName;
+        document.getElementById("account-name").textContent = pname || user.email;
+        if (pname) {
+          document.getElementById("order-name").value = pname;
         }
       });
       document.getElementById("order-contact").value = user.email;
