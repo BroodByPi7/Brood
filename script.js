@@ -842,30 +842,48 @@ function onReady() {
 if (typeof onAuthChanged === "function") onReady();
 else document.addEventListener("DOMContentLoaded", onReady);
 
-// ── Payment via Stripe Checkout ─────────────────────────────────────────────
+// ── Payment via Omise PromptPay QR ──────────────────────────────────────────
 
-async function payWithStripe(orderId) {
+const qrImage = document.getElementById("qr-image");
+const qrStatus = document.getElementById("qr-status");
+
+async function payWithOmise(orderId) {
+  const callable = typeof firebase !== "undefined" && firebase.functions
+    ? firebase.functions().httpsCallable("createPromptPayCharge")
+    : null;
+  if (!callable) {
+    showQrFallback();
+    return;
+  }
   try {
-    const callable = typeof firebase !== "undefined" && firebase.functions
-      ? firebase.functions().httpsCallable("createCheckoutSession")
-      : null;
-    if (!callable) {
-      document.getElementById("qr-modal").classList.add("is-open");
-      document.body.style.overflow = "hidden";
-      return;
-    }
-    const origin = window.location.origin;
-    const result = await callable({ orderId, origin });
-    if (result.data && result.data.url) {
-      window.location.href = result.data.url;
-    } else {
-      alert("Failed to create payment session.");
-    }
-  } catch (err) {
-    alert("Payment error: " + (err.message || "Unknown error"));
+    if (qrStatus) qrStatus.textContent = "Creating payment QR…";
+    if (qrImage) qrImage.style.display = "none";
     document.getElementById("qr-modal").classList.add("is-open");
     document.body.style.overflow = "hidden";
+
+    const result = await callable({ orderId });
+    const data = result.data;
+
+    if (data && data.qrUrl) {
+      if (qrImage) {
+        qrImage.src = data.qrUrl;
+        qrImage.style.display = "block";
+      }
+      if (qrStatus) qrStatus.textContent = "Scan the QR with your banking app to pay.";
+    } else {
+      if (qrStatus) qrStatus.textContent = "QR not available. Use the placeholder below.";
+    }
+  } catch (err) {
+    if (qrStatus) qrStatus.textContent = "Payment setup failed: " + (err.message || "error");
+    showQrFallback();
   }
+}
+
+function showQrFallback() {
+  if (qrImage) qrImage.style.display = "none";
+  if (qrStatus) qrStatus.textContent = "";
+  document.getElementById("qr-modal").classList.add("is-open");
+  document.body.style.overflow = "hidden";
 }
 
 // ── Pickup section ───────────────────────────────────────────────────────────
@@ -904,7 +922,7 @@ function renderPickupOrders(orders) {
 
   container.querySelectorAll(".pickup-pay").forEach((btn) => {
     btn.addEventListener("click", () => {
-      payWithStripe(btn.dataset.orderId);
+      payWithOmise(btn.dataset.orderId);
     });
   });
 }

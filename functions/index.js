@@ -1,100 +1,109 @@
 const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
-const Stripe = require("stripe");
+const crypto = require("crypto");
 
 admin.initializeApp();
 const db = admin.firestore();
 
-const STRIPE_SECRET = defineSecret("STRIPE_SECRET");
-const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
+const OMISE_SECRET = defineSecret("OMISE_SECRET");
 
-exports.createCheckoutSession = onCall(
-  { secrets: [STRIPE_SECRET], cors: true },
+/**
+ * Creates a PromptPay charge via Omise and returns the QR image URL.
+ * Called from the client when the user clicks Pay.
+ */
+exports.createPromptPayCharge = onCall(
+  { secrets: [OMISE_SECRET], cors: true },
   async (request) => {
     if (!request.auth) {
-      throw new HttpsError("unauthenticated", "You must be signed in to pay.");
+      throw new HttpsError("unauthenticated", "You must be signed in.");
     }
 
     const orderId = request.data.orderId;
-    if (!orderId) {
-      throw new HttpsError("invalid-argument", "Missing orderId.");
-    }
+    if (!orderId) throw new HttpsError("invalid-argument", "Missing orderId.");
 
-    const orderSnap = await db.collection("orders").doc(orderId).get();
-    if (!orderSnap.exists) {
-      throw new HttpsError("not-found", "Order not found.");
-    }
+    const snap = await db.collection("orders").doc(orderId).get();
+    if (!snap.exists) throw new HttpsError("not-found", "Order not found.");
 
-    const order = orderSnap.data();
-
+    const order = snap.data();
     if (order.customerId !== request.auth.uid) {
-      throw new HttpsError("permission-denied", "This order does not belong to you.");
+      throw new HttpsError("permission-denied", "Not your order.");
     }
-
     if (order.status !== "confirmed") {
-      throw new HttpsError("failed-precondition", "Order is not yet confirmed.");
+      throw new HttpsError("failed-precondition", "Order not confirmed yet.");
     }
 
-    const stripe = Stripe(STRIPE_SECRET.value());
+    const omise = require("omise")({ secretKey: OMISE_SECRET.value() });
+    const amountSatang = Math.round((order.total || 0) * 100);
 
-    const lineItems = (order.items || []).map((item) => ({
-      price_data: {
-        currency: "usd",
-        product_data: { name: item.name + (item.type ? " (" + item.type + ")" : "") },
-        unit_amount: Math.round(item.price * 100),
-      },
-      quantity: item.qty || 1,
-    }));
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "payment",
-      line_items: lineItems,
+    const charge = await omise.charges.create({
+      amount: amountSatang,
+      currency: "thb",
+      source: { type: "promptpay" },
       metadata: { orderId, customerId: request.auth.uid },
-      success_url: request.data.origin + "/Brood/?payment=success&order=" + orderId,
-      cancel_url: request.data.origin + "/Brood/?payment=cancelled",
     });
 
-    return { url: session.url };
+    const qrUrl = charge.source && charge.source.scannable_code
+      ? charge.source.scannable_code.image.downloadable
+      : charge.source && charge.source.instructions
+        ? charge.source.instructions.qr_image
+        : null;
+
+    await db.collection("orders").doc(orderId).update({
+      omiseChargeId: charge.id,
+      omiseQrUrl: qrUrl,
+    });
+
+    return { qrUrl, chargeId: charge.id };
   }
 );
 
-exports.stripeWebhook = onRequest(
-  { secrets: [STRIPE_WEBHOOK_SECRET] },
+/**
+ * Receives the Omise webhook when a payment completes.
+ * The webhook URL needs to be registered in the Omise dashboard
+ * (e.g. https://REGION-PROJECT.cloudfunctions.net/omiseWebhook).
+ * Omise sends a POST with JSON body and X-Omise-Signature header.
+ */
+exports.omiseWebhook = onRequest(
+  { secrets: [OMISE_SECRET], cors: false },
   async (req, res) => {
-    const sig = req.headers["stripe-signature"];
-    if (!sig) {
-      res.status(400).send("Missing stripe-signature header.");
+    if (req.method !== "POST") {
+      res.status(405).send("Method not allowed.");
       return;
     }
 
-    const stripe = Stripe(STRIPE_SECRET.value());
-
-    let event;
-    try {
-      event = stripe.webhooks.constructEvent(
-        req.rawBody,
-        sig,
-        STRIPE_WEBHOOK_SECRET.value()
-      );
-    } catch (err) {
-      console.error("Webhook signature verification failed:", err.message);
-      res.status(400).send("Webhook signature verification failed.");
+    // Verify Omise webhook signature
+    const signature = req.headers["x-omise-signature"];
+    if (!signature) {
+      res.status(400).send("Missing X-Omise-Signature header.");
       return;
     }
 
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object;
-      const orderId = session.metadata.orderId;
+    const rawBody = typeof req.rawBody === "string" ? req.rawBody : JSON.stringify(req.body);
+    const expected = crypto
+      .createHmac("sha256", OMISE_SECRET.value())
+      .update(rawBody)
+      .digest("hex");
 
-      if (orderId) {
+    if (signature !== expected) {
+      console.warn("Omise webhook signature mismatch");
+      res.status(401).send("Invalid signature.");
+      return;
+    }
+
+    const event = req.body;
+    if (event.key === "charge.complete" && event.data) {
+      const chargeId = event.data.id;
+      const metadata = event.data.metadata || {};
+      const orderId = metadata.orderId;
+
+      if (orderId && chargeId) {
         await db.collection("orders").doc(orderId).update({
           status: "paid",
           paidAt: admin.firestore.FieldValue.serverTimestamp(),
-          stripeSessionId: session.id,
+          omiseChargeId: chargeId,
         });
-        console.log("Order " + orderId + " marked paid.");
+        console.log("Order " + orderId + " marked paid via Omise webhook.");
       }
     }
 
