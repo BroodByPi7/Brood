@@ -352,11 +352,7 @@ const calendar = document.getElementById("calendar-widget");
 const calGrid = calendar ? calendar.querySelector(".cal-grid") : null;
 const calLabel = calendar ? calendar.querySelector(".cal-label") : null;
 
-if (pickupDate) {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  pickupDate.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
+if (pickupDate) pickupDate.value = "";
 
 let calMonth = new Date();
 calMonth.setDate(1);
