@@ -145,7 +145,6 @@ const basketSidebar = document.querySelector(".basket-sidebar");
 const basketToggle = document.querySelector(".basket-toggle");
 const basketCount = document.querySelector(".basket-count");
 const basketIconCount = document.getElementById("basket-icon-count");
-const basketToggle = document.querySelector(".basket-toggle");
 
 function renderBasket() {
   basketItems.innerHTML = "";
