@@ -761,10 +761,12 @@ function setupAuth() {
     }
   });
 }
-if (typeof onAuthChanged === "function") { setupAuth(); }
-else { document.addEventListener("DOMContentLoaded", setupAuth); }
-
-loadPrices();
+function onReady() {
+  setupAuth();
+  loadPrices();
+}
+if (typeof onAuthChanged === "function") onReady();
+else document.addEventListener("DOMContentLoaded", onReady);
 
 // ── Icon color flip on dark sections ──────────────────────────────────────────
 

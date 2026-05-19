@@ -33,7 +33,7 @@ document.getElementById("admin-login-form").addEventListener("submit", async (e)
 
 if (typeof onAuthChanged === "function") {
   onAuthChanged((user) => {
-    if (user) showAdmin(); else showLogin();
+    if (user && user.email === "broodbypi7@gmail.com") showAdmin(); else showLogin();
   });
 } else {
   showLogin("Firebase not loaded. Configure firebase.js first.");
