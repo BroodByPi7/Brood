@@ -700,11 +700,12 @@ p {
 
 .about-bg {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  background: url("Images/Logo.png") center / auto 70% no-repeat;
-  opacity: 0.15;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 70%;
+  width: auto;
+  opacity: 0.12;
   pointer-events: none;
 }
 
