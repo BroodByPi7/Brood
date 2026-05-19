@@ -274,14 +274,17 @@
       </div>
 
       <form class="order-form" novalidate>
-        <div class="order-form-row">
+        <div class="order-form-row" style="grid-template-columns:1fr 1fr 1fr">
           <div class="order-field">
             <input type="text" id="order-name" placeholder="Your name" required>
             <span class="order-warn" id="warn-name"></span>
           </div>
           <div class="order-field">
-            <input type="text" id="order-contact" placeholder="Email or phone" required>
-            <span class="order-warn" id="warn-contact"></span>
+            <input type="email" id="order-email" placeholder="Email" required>
+            <span class="order-warn" id="warn-email"></span>
+          </div>
+          <div class="order-field">
+            <input type="tel" id="order-phone" placeholder="Phone (optional)">
           </div>
         </div>
         <textarea id="order-notes" rows="3" placeholder="Order notes or special requests (optional)"></textarea>

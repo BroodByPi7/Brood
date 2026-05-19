@@ -545,12 +545,12 @@ const orderForm = document.querySelector(".order-form");
 const orderSubmitBtn = orderForm?.querySelector(".order-submit");
 function validateOrder() {
   const name = document.getElementById("order-name").value.trim();
-  const contact = document.getElementById("order-contact").value.trim();
+  const contact = document.getElementById("order-email").value.trim();
   const date = pickupDate ? pickupDate.value : "";
   const slot = document.querySelector(".slot-btn.is-selected");
   const time = slot ? slot.dataset.time : "";
   const warnName = document.getElementById("warn-name");
-  const warnContact = document.getElementById("warn-contact");
+  const warnContact = document.getElementById("warn-email");
   const warnDate = document.getElementById("warn-date");
   const warnSlot = document.getElementById("warn-slot");
 
@@ -558,7 +558,7 @@ function validateOrder() {
 
   const checks = [
     { ok: !!name, warn: warnName, msg: "Enter your name", focus: document.getElementById("order-name") },
-    { ok: !!contact, warn: warnContact, msg: "Enter an email or phone", focus: document.getElementById("order-contact") },
+    { ok: !!contact, warn: warnContact, msg: "Enter your email", focus: document.getElementById("order-email") },
     { ok: !!date, warn: warnDate, msg: "Pick a date", focus: document.getElementById("calendar-widget") },
     { ok: !!time, warn: warnSlot, msg: "Pick a time slot", focus: slot || document.querySelector(".slot-btn") },
   ];
@@ -589,7 +589,7 @@ function validateOrder() {
 function refreshWarnings() {
   const pairs = [
     { el: document.getElementById("order-name"), warn: document.getElementById("warn-name"), msg: "Enter your name" },
-    { el: document.getElementById("order-contact"), warn: document.getElementById("warn-contact"), msg: "Enter an email or phone" },
+    { el: document.getElementById("order-email"), warn: document.getElementById("warn-email"), msg: "Enter your email" },
   ];
   pairs.forEach(({ el, warn, msg }) => {
     if (!el || !warn) return;
@@ -605,7 +605,7 @@ function showLiveWarnings() {
   refreshWarnings();
   const pairs = [
     { el: document.getElementById("order-name"), warn: document.getElementById("warn-name"), msg: "Enter your name" },
-    { el: document.getElementById("order-contact"), warn: document.getElementById("warn-contact"), msg: "Enter an email or phone" },
+    { el: document.getElementById("order-email"), warn: document.getElementById("warn-email"), msg: "Enter your email" },
   ];
   pairs.forEach(({ el, warn, msg }) => {
     if (!el || !warn) return;
@@ -648,7 +648,8 @@ if (orderForm) {
     }
 
     const name = document.getElementById("order-name").value.trim();
-    const contact = document.getElementById("order-contact").value.trim();
+    const contact = document.getElementById("order-email").value.trim();
+    const phone = document.getElementById("order-phone").value.trim();
 
     if (orderSubmitBtn) orderSubmitBtn.disabled = true;
 
@@ -669,7 +670,7 @@ if (orderForm) {
       try {
         await placeOrder({
           customerId: user.uid,
-          customerName: name, customerContact: contact,
+          customerName: name, customerContact: contact, customerPhone: phone,
           date, time, notes, items, total,
           status: "pending",
           createdAt: new Date().toISOString()
@@ -689,7 +690,7 @@ if (orderForm) {
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     orders.push({
       id, createdAt: new Date().toISOString(),
-      date, time, customerName: name, customerContact: contact, notes,
+      date, time, customerName: name, customerContact: contact, customerPhone: phone, notes,
       items, total, status: "pending"
     });
     setOrders(orders);
@@ -814,7 +815,7 @@ function setupAuth() {
         }
         refreshWarnings();
       });
-      document.getElementById("order-contact").value = user.email;
+      document.getElementById("order-email").value = user.email;
       refreshWarnings();
       setupPickupOrders(user);
       if (adminLinkBelow && user.email === "broodbypi7@gmail.com") {
@@ -826,7 +827,8 @@ function setupAuth() {
       userBtn.setAttribute("aria-label", "Sign in");
       userBtn.onclick = openAuthModal;
       if (adminLinkBelow) adminLinkBelow.style.display = "none";
-      document.getElementById("order-contact").value = "";
+      document.getElementById("order-email").value = "";
+      document.getElementById("order-phone").value = "";
       document.getElementById("order-name").value = "";
       if (unsubPickupOrders) { unsubPickupOrders(); unsubPickupOrders = null; }
       const container = document.getElementById("pickup-orders");

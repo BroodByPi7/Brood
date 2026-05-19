@@ -110,7 +110,7 @@ function renderOrders() {
             ${o.time ? `<span style="margin-left:0.5rem;font-size:0.85rem;color:var(--muted)">${o.time}</span>` : ""}
           </div>
         </div>
-        <div class="order-card-contact">${o.customerName || "?"} — ${o.customerContact || "?"}</div>
+        <div class="order-card-contact">${o.customerName || "?"} — ${o.customerContact || "?"}${o.customerPhone ? " · " + o.customerPhone : ""}</div>
         <div class="order-card-items">${itemsHtml}</div>
         <div style="font-weight:700;color:var(--brood-blue)">$${(o.total || 0).toFixed(2)}</div>
         ${o.notes ? `<div class="order-card-notes">${escapeHtml(o.notes)}</div>` : ""}
@@ -207,7 +207,7 @@ function renderArchived() {
             ${o.time ? `<span style="margin-left:0.5rem;font-size:0.85rem;color:var(--muted)">${o.time}</span>` : ""}
           </div>
         </div>
-        <div class="order-card-contact">${o.customerName || "?"} — ${o.customerContact || "?"}</div>
+        <div class="order-card-contact">${o.customerName || "?"} — ${o.customerContact || "?"}${o.customerPhone ? " · " + o.customerPhone : ""}</div>
         <div class="order-card-items">${itemsHtml}</div>
         <div style="font-weight:700;color:var(--brood-blue)">$${(o.total || 0).toFixed(2)}</div>
         ${o.notes ? `<div class="order-card-notes">${escapeHtml(o.notes)}</div>` : ""}
