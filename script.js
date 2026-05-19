@@ -23,6 +23,68 @@ menuTrigger.addEventListener("click", (e) => {
   setMenuState(!cornerMenu.classList.contains("is-open"));
 });
 
+// ── Currency & pricing ───────────────────────────────────────────────────────
+
+const currencies = {
+  USD: { symbol: "$", rate: 1 },
+  EUR: { symbol: "€", rate: 0.92 },
+  THB: { symbol: "฿", rate: 34 }
+};
+let currentCurrency = localStorage.getItem("brood_currency") || "USD";
+
+function formatPrice(usdPrice) {
+  const c = currencies[currentCurrency];
+  return c.symbol + (usdPrice * c.rate).toFixed(2);
+}
+
+const currencySelect = document.getElementById("currency-select");
+if (currencySelect) {
+  currencySelect.value = currentCurrency;
+  currencySelect.addEventListener("change", () => {
+    currentCurrency = currencySelect.value;
+    localStorage.setItem("brood_currency", currentCurrency);
+    renderBasket();
+    document.querySelectorAll(".popup-add").forEach((btn) => {
+      const m = btn.textContent.match(/^(.*?—)\s*.+/);
+      if (m) {
+        const price = parseFloat(btn.dataset.usdPrice);
+        if (Number.isFinite(price)) btn.textContent = m[1] + " " + formatPrice(price);
+      }
+    });
+  });
+}
+
+function loadPrices() {
+  try {
+    const cached = JSON.parse(localStorage.getItem("brood_prices"));
+    if (cached && typeof cached.items === "object") applyPrices(cached.items);
+  } catch {}
+  if (typeof listenPrices === "function") {
+    listenPrices((prices) => {
+      if (prices && prices.items) {
+        localStorage.setItem("brood_prices", JSON.stringify(prices));
+        applyPrices(prices.items);
+      }
+    });
+  }
+}
+
+function applyPrices(items) {
+  document.querySelectorAll(".menu-card").forEach((card) => {
+    const name = card.querySelector(".card-body h4").textContent;
+    if (items[name] && Number.isFinite(items[name].price)) {
+      card.dataset.price = items[name].price;
+    }
+  });
+  document.querySelectorAll(".popup-add").forEach((btn) => {
+    const price = parseFloat(btn.dataset.usdPrice);
+    if (Number.isFinite(price)) {
+      const m = btn.textContent.match(/^(.*?—)\s*.+/);
+      if (m) btn.textContent = m[1] + " " + formatPrice(price);
+    }
+  });
+}
+
 menuTrigger.addEventListener("mouseenter", () => {
   cancelMenuClose();
   setMenuState(true);
@@ -91,7 +153,7 @@ function renderBasket() {
 
   if (basket.length === 0) {
     basketItems.innerHTML = '<p class="basket-empty">Your basket is empty</p>';
-    basketTotal.textContent = "$0.00";
+    basketTotal.textContent = formatPrice(0);
     basketCount.textContent = "0";
     basketToggle.classList.remove("is-visible");
     return;
@@ -110,7 +172,7 @@ function renderBasket() {
 
     div.innerHTML = `
       <span class="basket-item-name">${item.name}</span>
-      <span class="basket-item-price">$${lineTotal.toFixed(2)}</span>
+      <span class="basket-item-price">${formatPrice(lineTotal)}</span>
       ${item.type ? `<span class="basket-item-type">${item.type}</span>` : ""}
       <div class="basket-item-actions">
         <button class="item-minus" data-index="${index}" aria-label="Decrease quantity">&minus;</button>
@@ -123,7 +185,7 @@ function renderBasket() {
     basketItems.appendChild(div);
   });
 
-  basketTotal.textContent = `$${total.toFixed(2)}`;
+  basketTotal.textContent = formatPrice(total);
   basketCount.textContent = count;
   basketToggle.classList.add("is-visible");
 
@@ -160,7 +222,7 @@ function renderBasket() {
     const items = basket.map((i) => `${i.qty}× ${i.name}`).join(", ");
     summaryEl.textContent = count > 0 ? `${count} item${count !== 1 ? "s" : ""}` : "0 items";
     if (count > 0) {
-      summaryEl.textContent += ` — $${total.toFixed(2)}`;
+      summaryEl.textContent += ` — ${formatPrice(total)}`;
     }
   }
 }
@@ -227,7 +289,7 @@ document.querySelectorAll(".menu-card").forEach((card) => {
             <span class="qty-value">1</span>
             <button class="qty-btn qty-plus" type="button" aria-label="Increase quantity">+</button>
           </div>
-          <button class="popup-add" type="button">Add to order — $${price.toFixed(2)}</button>
+          <button class="popup-add" type="button" data-usd-price="${price}">Add to order — ${formatPrice(price)}</button>
         </div>
       </div>
     `;
@@ -626,6 +688,8 @@ function setupAuth() {
 if (typeof onAuthChanged === "function") { setupAuth(); }
 else { document.addEventListener("DOMContentLoaded", setupAuth); }
 
+loadPrices();
+
 accountPanel.querySelector(".account-backdrop").addEventListener("click", () => {
   accountPanel.classList.remove("is-open");
   document.body.style.overflow = "";
@@ -659,7 +723,7 @@ async function loadUserOrders(uid) {
               <span class="account-order-status ${o.status}">${o.status}</span>
             </div>
             <div style="margin-top:0.3rem">${items}</div>
-            <div class="account-order-total">$${o.total.toFixed(2)}</div>
+            <div class="account-order-total">${formatPrice(o.total)}</div>
             <button class="account-order-reorder" data-order-id="${o.id}" data-items='${JSON.stringify(o.items).replace(/'/g, "&#39;")}'>Reorder</button>
           </div>
         `;

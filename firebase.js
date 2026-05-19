@@ -125,3 +125,15 @@ function getUserProfile(uid) {
   if (!db) return Promise.resolve(null);
   return db.collection("users").doc(uid).get().then((doc) => doc.exists ? doc.data() : null);
 }
+
+function listenPrices(callback) {
+  if (!db) return;
+  return db.collection("config").doc("prices").onSnapshot((doc) => {
+    callback(doc.exists ? doc.data() : { items: {} });
+  });
+}
+
+function savePrices(prices) {
+  if (!db) return Promise.reject("Firebase not ready");
+  return db.collection("config").doc("prices").set(prices, { merge: true });
+}

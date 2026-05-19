@@ -1164,6 +1164,31 @@ p {
   font-size: 0.72rem !important;
 }
 
+.currency-select {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  font-weight: 700;
+  color: var(--brood-blue);
+  background: transparent;
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.currency-select:hover,
+.currency-select:focus-visible {
+  background: var(--brood-blue);
+  color: var(--paper);
+  outline: 0;
+}
+
 /* ── Auth modal ──────────────────────── */
 
 .auth-modal {

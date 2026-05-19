@@ -33,6 +33,11 @@
       <a href="#about">About</a>
       <button class="nav-auth-btn" type="button" id="nav-auth-btn" style="background:none;border:none;color:var(--brood-blue);font:inherit;font-size:0.85rem;font-weight:700;cursor:pointer;padding:0.72rem 0.8rem;text-transform:uppercase;letter-spacing:0.06em;">Sign in</button>
       <a href="admin.html" class="admin-link" style="opacity:0.3;font-size:0.7rem;">Admin</a>
+      <select class="currency-select" id="currency-select" aria-label="Currency">
+        <option value="USD">$ USD</option>
+        <option value="EUR">€ EUR</option>
+        <option value="THB">฿ THB</option>
+      </select>
     </nav>
   </header>
 
@@ -187,12 +192,21 @@
                 <p>Soft sourdough rolls and small-batch donuts</p>
               </div>
             </div>
-            <div class="menu-card" data-price="5.00" data-types='["Bacon cheese","Chocolate almond"]'>
-              <div class="card-img">
-                <img src="Images/Preorder/BriocheBun.jpg" alt="Brioche loafs or buns" loading="lazy">
+            <div class="menu-card" data-price="6.00">
+              <div class="card-img card-placeholder">
+                <span>Photo coming soon</span>
               </div>
               <div class="card-body">
-                <h4>Brioche loafs or buns</h4>
+                <h4>Brioche loafs</h4>
+                <p>Soft buttery brioche loaf</p>
+              </div>
+            </div>
+            <div class="menu-card" data-price="5.00" data-types='["Bacon cheese","Chocolate almond"]'>
+              <div class="card-img">
+                <img src="Images/Preorder/BriocheBun.jpg" alt="Brioche buns" loading="lazy">
+              </div>
+              <div class="card-body">
+                <h4>Brioche buns</h4>
                 <p>Bacon cheese, Chocolate almond</p>
               </div>
             </div>

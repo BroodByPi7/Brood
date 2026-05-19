@@ -44,6 +44,7 @@ if (typeof onAuthChanged === "function") {
 let allOrders = [];
 let unsubOrders = null;
 let unsubLimits = null;
+let unsubPrices = null;
 
 function initAdmin() {
   if (typeof listenOrders === "function") {
@@ -59,6 +60,13 @@ function initAdmin() {
     unsubLimits = listenLimits((limits) => {
       document.getElementById("limit-perday").value = limits.maxPerDay || 50;
       renderLimitItems(limits);
+    });
+  }
+
+  if (typeof listenPrices === "function") {
+    if (unsubPrices) unsubPrices();
+    unsubPrices = listenPrices((prices) => {
+      renderPricingItems(prices);
     });
   }
 }
@@ -157,7 +165,7 @@ const menuItems = [
   "Shio pans", "Croissants", "Pain au chocolat", "Focaccias",
   "Sourdoughs", "Shoku pans", "Baguette",
   "Cakes", "Pies", "Viennoiseries", "Brownies", "Cookies",
-  "Cinnamon rolls and donuts", "Brioche loafs or buns"
+  "Cinnamon rolls and donuts", "Brioche loafs", "Brioche buns"
 ];
 
 function renderLimitItems(limits) {
@@ -184,6 +192,44 @@ document.querySelector(".admin-save-limits").addEventListener("click", () => {
   if (typeof saveLimits === "function") {
     saveLimits({ maxPerDay, items })
       .then(() => showToast("Limits saved"))
+      .catch((err) => showToast("Save failed: " + (err.message || err)));
+  }
+});
+
+// ── Pricing ──────────────────────────────────────────────────────────────────
+
+const defaultPrices = {
+  "Shio pans": 4.00, "Croissants": 4.50, "Pain au chocolat": 5.00, "Focaccias": 6.00,
+  "Sourdoughs": 7.00, "Shoku pans": 6.00, "Baguette": 4.00,
+  "Cakes": 25.00, "Pies": 20.00, "Viennoiseries": 3.50, "Brownies": 4.50, "Cookies": 3.00,
+  "Cinnamon rolls and donuts": 4.00, "Brioche loafs": 6.00, "Brioche buns": 5.00
+};
+
+function renderPricingItems(prices) {
+  const container = document.getElementById("pricing-items");
+  if (!container) return;
+  const saved = prices.items || {};
+  container.innerHTML = menuItems.map((name) => {
+    const val = (saved[name] && saved[name].price) || defaultPrices[name] || "";
+    return `
+      <div class="limit-item-row">
+        <span>${name}</span>
+        <input type="number" min="0" step="0.50" class="pricing-item-input" data-name="${name}" value="${val}" placeholder="0.00">
+      </div>
+    `;
+  }).join("");
+}
+
+document.getElementById("save-pricing")?.addEventListener("click", () => {
+  const items = {};
+  document.querySelectorAll(".pricing-item-input").forEach((input) => {
+    const val = parseFloat(input.value);
+    items[input.dataset.name] = { price: Number.isFinite(val) ? Math.max(0, val) : 0 };
+  });
+
+  if (typeof savePrices === "function") {
+    savePrices({ items })
+      .then(() => showToast("Prices saved"))
       .catch((err) => showToast("Save failed: " + (err.message || err)));
   }
 });

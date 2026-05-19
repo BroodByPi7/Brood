@@ -21,6 +21,7 @@
       </div>
       <nav class="admin-nav">
         <button class="admin-nav-btn is-active" data-tab="orders">Orders</button>
+        <button class="admin-nav-btn" data-tab="pricing">Pricing</button>
         <button class="admin-nav-btn" data-tab="limits">Limits</button>
       </nav>
     </div>
@@ -53,6 +54,20 @@
       </div>
       <div class="orders-list" id="orders-list">
         <p class="admin-empty">No orders yet.</p>
+      </div>
+    </section>
+
+    <!-- Pricing tab -->
+    <section class="admin-tab" id="tab-pricing">
+      <div class="admin-tab-head">
+        <h2>Item pricing</h2>
+        <p class="admin-limits-note">Set prices per item. Prices are in USD (base currency).</p>
+      </div>
+      <div class="admin-pricing-form">
+        <div id="pricing-items">
+          <!-- Filled by JS -->
+        </div>
+        <button class="admin-save-limits" type="button" id="save-pricing">Save prices</button>
       </div>
     </section>
 
