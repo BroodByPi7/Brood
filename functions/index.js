@@ -1,7 +1,9 @@
 const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
+const nodemailer = require("nodemailer");
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -141,5 +143,74 @@ exports.dailyArchiveOrders = onSchedule(
 
     if (count > 0) await batch.commit();
     console.log("Archived " + count + " orders at midnight.");
+  }
+);
+
+const GMAIL_EMAIL = defineSecret("GMAIL_EMAIL");
+const GMAIL_APP_PASSWORD = defineSecret("GMAIL_APP_PASSWORD");
+
+/**
+ * Sends a confirmation email when an order status changes to "paid".
+ */
+exports.onOrderPaid = onDocumentUpdated(
+  {
+    document: "orders/{orderId}",
+    secrets: [GMAIL_EMAIL, GMAIL_APP_PASSWORD],
+  },
+  async (event) => {
+    const before = event.data.before.data();
+    const after = event.data.after.data();
+
+    if (!before || !after) return;
+    if (before.status === "paid" || after.status !== "paid") return;
+
+    const order = after;
+    const customerEmail = order.customerContact && order.customerContact.includes("@")
+      ? order.customerContact
+      : null;
+    if (!customerEmail) {
+      console.log("No email in customerContact, skipping email for order", event.params.orderId);
+      return;
+    }
+
+    const items = (order.items || [])
+      .map((i) => `${i.qty}× ${i.name}${i.type ? " (" + i.type + ")" : ""}`)
+      .join("<br>");
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: GMAIL_EMAIL.value(),
+        pass: GMAIL_APP_PASSWORD.value(),
+      },
+    });
+
+    const mailOptions = {
+      from: GMAIL_EMAIL.value(),
+      to: customerEmail,
+      subject: "Your Brood order is confirmed and paid!",
+      html: `
+        <div style="font-family:sans-serif;max-width:520px;margin:0 auto">
+          <h2 style="color:#073f9e">Thank you for your order!</h2>
+          <p>Hi ${order.customerName || ""},</p>
+          <p>Your order has been paid. See you at the shop!</p>
+          <table style="width:100%;border-collapse:collapse;margin:1rem 0">
+            <tr><td style="padding:0.4rem 0;font-weight:700">Date</td><td>${order.date || "—"}</td></tr>
+            <tr><td style="padding:0.4rem 0;font-weight:700">Time</td><td>${order.time || "—"}</td></tr>
+            <tr><td style="padding:0.4rem 0;font-weight:700">Items</td><td>${items}</td></tr>
+            <tr><td style="padding:0.4rem 0;font-weight:700">Total</td><td>$${(order.total || 0).toFixed(2)} USD</td></tr>
+            ${order.notes ? `<tr><td style="padding:0.4rem 0;font-weight:700">Notes</td><td>${order.notes}</td></tr>` : ""}
+          </table>
+          <p style="color:#48618b;font-size:0.85rem">Brood Bakery — broodbypi7@gmail.com</p>
+        </div>
+      `,
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log("Confirmation email sent to", customerEmail);
+    } catch (err) {
+      console.error("Failed to send email:", err.message);
+    }
   }
 );

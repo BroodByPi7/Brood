@@ -842,46 +842,6 @@ function onReady() {
 if (typeof onAuthChanged === "function") onReady();
 else document.addEventListener("DOMContentLoaded", onReady);
 
-// ── Email notification (EmailJS) ────────────────────────────────────────────
-// 1. Sign up at https://www.emailjs.com (free, 200 emails/month)
-// 2. Create a service (Gmail, Outlook, etc.) → get service ID
-// 3. Create an email template with variables: {{customer_name}}, {{date}}, {{time}}, {{items}}, {{total}}
-// 4. Copy your Public Key from Account → API Keys
-// Then fill in the values below:
-const EMAILJS_CONFIG = {
-  serviceId: "service_xxxxx",
-  templateId: "template_xxxxx",
-  publicKey: "your_public_key",
-};
-
-const notifiedOrders = new Set();
-
-async function sendOrderEmail(order) {
-  if (!EMAILJS_CONFIG.publicKey || EMAILJS_CONFIG.publicKey === "your_public_key") return;
-  const items = (order.items || []).map((i) => `${i.qty}× ${i.name}${i.type ? " (" + i.type + ")" : ""}`).join(", ");
-  try {
-    await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        service_id: EMAILJS_CONFIG.serviceId,
-        template_id: EMAILJS_CONFIG.templateId,
-        user_id: EMAILJS_CONFIG.publicKey,
-        template_params: {
-          customer_name: order.customerName || order.customerContact || "Valued customer",
-          date: order.date || "",
-          time: order.time || "",
-          items: items || "Order items",
-          total: formatPrice(order.total),
-          order_id: order.id ? order.id.slice(-8) : "---",
-        },
-      }),
-    });
-  } catch (e) {
-    console.warn("Email send failed:", e);
-  }
-}
-
 // ── Payment via Omise PromptPay QR ──────────────────────────────────────────
 
 const qrImage = document.getElementById("qr-image");
@@ -1003,14 +963,6 @@ function renderPickupOrders(orders) {
       </div>
     `;
   }).join("");
-
-  // Send email for newly paid orders
-  visible.forEach((o) => {
-    if (o.status === "paid" && !notifiedOrders.has(o.id)) {
-      notifiedOrders.add(o.id);
-      sendOrderEmail(o);
-    }
-  });
 
   // Show map if any order is paid
   const mapEl = document.getElementById("pickup-map");
