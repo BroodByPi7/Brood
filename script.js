@@ -888,6 +888,21 @@ function showQrFallback() {
 
 // ── Pickup section ───────────────────────────────────────────────────────────
 
+let unsubPickupOrders = null;
+
+function setupPickupOrders(user) {
+  const container = document.getElementById("pickup-orders");
+  if (!container) return;
+  if (unsubPickupOrders) { unsubPickupOrders(); unsubPickupOrders = null; }
+  if (typeof getUserOrders !== "function") {
+    container.innerHTML = '<p class="pickup-empty">Sign in to view your orders.</p>';
+    return;
+  }
+  unsubPickupOrders = getUserOrders(user.uid, (orders) => {
+    renderPickupOrders(orders);
+  });
+}
+
 function renderPickupOrders(orders) {
   const container = document.getElementById("pickup-orders");
   if (!container) return;
