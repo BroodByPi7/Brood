@@ -617,6 +617,10 @@ p {
   margin-bottom: 1rem;
 }
 
+.row-contact {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
 .order-form input,
 .order-form textarea {
   width: 100%;
@@ -708,6 +712,14 @@ p {
 
   .order-form-row {
     grid-template-columns: 1fr;
+  }
+
+  .row-contact {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .order-field-phone {
+    grid-column: 1 / -1;
   }
 
   .corner-menu {

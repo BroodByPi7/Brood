@@ -262,19 +262,19 @@
         <div class="order-slots">
           <p class="order-slots-label">Pickup time</p>
           <div class="slot-grid">
+            <button class="slot-btn" type="button" data-time="7:00-8:00">7–8 AM</button>
             <button class="slot-btn" type="button" data-time="8:00-9:00">8–9 AM</button>
             <button class="slot-btn" type="button" data-time="9:00-10:00">9–10 AM</button>
             <button class="slot-btn" type="button" data-time="10:00-11:00">10–11 AM</button>
             <button class="slot-btn" type="button" data-time="11:00-12:00">11–12 PM</button>
             <button class="slot-btn" type="button" data-time="12:00-13:00">12–1 PM</button>
-            <button class="slot-btn" type="button" data-time="13:00-14:00">1–2 PM</button>
           </div>
           <span class="order-warn" id="warn-slot"></span>
         </div>
       </div>
 
       <form class="order-form" novalidate>
-        <div class="order-form-row" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="order-form-row row-contact">
           <div class="order-field">
             <input type="text" id="order-name" placeholder="Your name" required>
             <span class="order-warn" id="warn-name"></span>
@@ -283,7 +283,7 @@
             <input type="email" id="order-email" placeholder="Email" required>
             <span class="order-warn" id="warn-email"></span>
           </div>
-          <div class="order-field">
+          <div class="order-field order-field-phone">
             <input type="tel" id="order-phone" placeholder="Phone (optional)">
           </div>
         </div>
