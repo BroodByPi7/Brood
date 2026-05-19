@@ -594,7 +594,7 @@ function validateOrder() {
   return { valid, firstEl };
 }
 
-function showLiveWarnings() {
+function refreshWarnings() {
   const pairs = [
     { el: document.getElementById("order-name"), warn: document.getElementById("warn-name"), msg: "Enter your name" },
     { el: document.getElementById("order-contact"), warn: document.getElementById("warn-contact"), msg: "Enter an email or phone" },
@@ -602,6 +602,21 @@ function showLiveWarnings() {
   pairs.forEach(({ el, warn, msg }) => {
     if (!el || !warn) return;
     warn.textContent = el.value.trim() ? "" : msg;
+  });
+  const warnDate = document.getElementById("warn-date");
+  if (warnDate) warnDate.textContent = pickupDate && pickupDate.value ? "" : "Pick a date";
+  const warnSlot = document.getElementById("warn-slot");
+  if (warnSlot) warnSlot.textContent = document.querySelector(".slot-btn.is-selected") ? "" : "Pick a time slot";
+}
+
+function showLiveWarnings() {
+  refreshWarnings();
+  const pairs = [
+    { el: document.getElementById("order-name"), warn: document.getElementById("warn-name"), msg: "Enter your name" },
+    { el: document.getElementById("order-contact"), warn: document.getElementById("warn-contact"), msg: "Enter an email or phone" },
+  ];
+  pairs.forEach(({ el, warn, msg }) => {
+    if (!el || !warn) return;
     el.addEventListener("input", () => { warn.textContent = el.value.trim() ? "" : msg; });
   });
   // Update warnings when calendar date changes
@@ -805,8 +820,10 @@ function setupAuth() {
           }
           document.getElementById("order-name").value = fallback;
         }
+        refreshWarnings();
       });
       document.getElementById("order-contact").value = user.email;
+      refreshWarnings();
       if (adminLinkBelow && user.email === "broodbypi7@gmail.com") {
         adminLinkBelow.style.display = "";
       } else if (adminLinkBelow) {
@@ -818,6 +835,7 @@ function setupAuth() {
       if (adminLinkBelow) adminLinkBelow.style.display = "none";
       document.getElementById("order-contact").value = "";
       document.getElementById("order-name").value = "";
+      refreshWarnings();
     }
   });
 }
