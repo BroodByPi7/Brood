@@ -705,8 +705,10 @@ else { document.addEventListener("DOMContentLoaded", setupAuth); }
 loadPrices();
 
 document.querySelector(".basket-checkout")?.addEventListener("click", () => {
-  closeBasket();
-  document.getElementById("order")?.scrollIntoView({ behavior: "smooth" });
+  basketSidebar.classList.remove("is-open");
+  document.body.style.overflow = "";
+  const orderEl = document.getElementById("order");
+  if (orderEl) setTimeout(() => orderEl.scrollIntoView({ behavior: "smooth" }), 250);
 });
 
 accountPanel.querySelector(".account-backdrop").addEventListener("click", () => {
