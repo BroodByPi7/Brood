@@ -934,34 +934,25 @@ const EMAILJS_CONFIG = {
 
 const notifiedOrders = new Set();
 
+if (typeof emailjs !== "undefined") emailjs.init(EMAILJS_CONFIG.publicKey);
+
 async function sendOrderEmail(order) {
   if (!EMAILJS_CONFIG.publicKey || EMAILJS_CONFIG.publicKey === "your_public_key") return;
+  if (!order.customerContact) { console.warn("EmailJS: no customer email"); return; }
   const items = (order.items || []).map((i) => `${i.qty}× ${i.name}${i.type ? " (" + i.type + ")" : ""}`).join(", ");
   try {
-    const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        service_id: EMAILJS_CONFIG.serviceId,
-        template_id: EMAILJS_CONFIG.templateId,
-        user_id: EMAILJS_CONFIG.publicKey,
-        template_params: {
-          to_email: order.customerContact || "",
-          customer_name: order.customerName || order.customerContact || "Valued customer",
-          date: order.date || "",
-          time: order.time || "",
-          items: items || "Order items",
-          total: formatPrice(order.total),
-          order_id: order.id ? order.id.slice(-8) : "---",
-        },
-      }),
+    const res = await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+      to_email: order.customerContact,
+      customer_name: order.customerName || order.customerContact,
+      date: order.date || "",
+      time: order.time || "",
+      items: items || "Order items",
+      total: formatPrice(order.total),
+      order_id: order.id ? order.id.slice(-8) : "---",
     });
-    if (!res.ok) {
-      const text = await res.text();
-      console.warn("EmailJS error:", res.status, text);
-    }
+    console.log("EmailJS sent:", res.status, res.text);
   } catch (e) {
-    console.warn("Email send failed:", e);
+    console.warn("EmailJS error:", e);
   }
 }
 
