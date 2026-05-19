@@ -532,7 +532,7 @@ function resetAfterOrder() {
   if (orderSubmitBtn) orderSubmitBtn.disabled = false;
   basket.length = 0;
   renderBasket();
-  orderForm.reset();
+  document.getElementById("order-notes").value = "";
   pickupDate.value = "";
   document.querySelectorAll(".slot-btn").forEach((b) => b.classList.remove("is-selected"));
   document.getElementById("order-name").focus();
