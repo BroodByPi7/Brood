@@ -423,6 +423,27 @@ p {
   color: var(--paper);
 }
 
+.catering-contact {
+  margin-top: 1.5rem;
+}
+
+.catering-btn {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--paper);
+  color: var(--brood-blue);
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  border-radius: 0;
+  transition: opacity 120ms;
+}
+
+.catering-btn:hover {
+  opacity: 0.85;
+}
+
 .order-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
