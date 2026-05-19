@@ -1,7 +1,6 @@
 const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
-const crypto = require("crypto");
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -34,6 +33,7 @@ exports.createPromptPayCharge = onCall(
     }
 
     const omise = require("omise")({ secretKey: OMISE_SECRET.value() });
+
     const amountSatang = Math.round((order.total || 0) * 100);
 
     const charge = await omise.charges.create({
@@ -60,9 +60,11 @@ exports.createPromptPayCharge = onCall(
 
 /**
  * Receives the Omise webhook when a payment completes.
- * The webhook URL needs to be registered in the Omise dashboard
- * (e.g. https://REGION-PROJECT.cloudfunctions.net/omiseWebhook).
- * Omise sends a POST with JSON body and X-Omise-Signature header.
+ * Verifies the charge by re-fetching it from the Omise API.
+ *
+ * Register in Omise dashboard → Webhooks:
+ *   URL: https://omiseWebhook-REGION-PROJECTID.cloudfunctions.net/omiseWebhook
+ *   Events: charge.complete
  */
 exports.omiseWebhook = onRequest(
   { secrets: [OMISE_SECRET], cors: false },
@@ -72,39 +74,37 @@ exports.omiseWebhook = onRequest(
       return;
     }
 
-    // Verify Omise webhook signature
-    const signature = req.headers["x-omise-signature"];
-    if (!signature) {
-      res.status(400).send("Missing X-Omise-Signature header.");
-      return;
-    }
-
-    const rawBody = typeof req.rawBody === "string" ? req.rawBody : JSON.stringify(req.body);
-    const expected = crypto
-      .createHmac("sha256", OMISE_SECRET.value())
-      .update(rawBody)
-      .digest("hex");
-
-    if (signature !== expected) {
-      console.warn("Omise webhook signature mismatch");
-      res.status(401).send("Invalid signature.");
-      return;
-    }
-
     const event = req.body;
-    if (event.key === "charge.complete" && event.data) {
-      const chargeId = event.data.id;
-      const metadata = event.data.metadata || {};
-      const orderId = metadata.orderId;
+    const chargeId = event.data && event.data.id;
+    const metadata = event.data && event.data.metadata;
 
-      if (orderId && chargeId) {
-        await db.collection("orders").doc(orderId).update({
-          status: "paid",
-          paidAt: admin.firestore.FieldValue.serverTimestamp(),
-          omiseChargeId: chargeId,
-        });
-        console.log("Order " + orderId + " marked paid via Omise webhook.");
+    if (!chargeId || !metadata || !metadata.orderId) {
+      res.status(400).send("Missing charge ID or order ID in webhook.");
+      return;
+    }
+
+    // Verify by re-fetching the charge from Omise to confirm it's really paid
+    try {
+      const omise = require("omise")({ secretKey: OMISE_SECRET.value() });
+      const charge = await omise.charges.retrieve(chargeId);
+
+      if (charge.status !== "successful") {
+        console.warn("Charge " + chargeId + " status is " + charge.status + " — not marking paid.");
+        res.status(200).send("Charge not yet successful.");
+        return;
       }
+
+      const orderId = metadata.orderId;
+      await db.collection("orders").doc(orderId).update({
+        status: "paid",
+        paidAt: admin.firestore.FieldValue.serverTimestamp(),
+        omiseChargeId: chargeId,
+      });
+      console.log("Order " + orderId + " marked paid via Omise webhook.");
+    } catch (err) {
+      console.error("Omise webhook verification failed:", err.message);
+      res.status(500).send("Verification failed.");
+      return;
     }
 
     res.status(200).send("OK");
