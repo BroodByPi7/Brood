@@ -230,11 +230,13 @@ function renderBasket() {
 function openBasket() {
   basketSidebar.classList.add("is-open");
   document.body.style.overflow = "hidden";
+  if (userArea) userArea.style.display = "none";
 }
 
 function closeBasket() {
   basketSidebar.classList.remove("is-open");
   document.body.style.overflow = "";
+  if (userArea) userArea.style.display = "";
 }
 
 basketSidebar.querySelector(".basket-backdrop").addEventListener("click", closeBasket);
@@ -599,6 +601,7 @@ if (orderForm) {
 
 const authModal = document.getElementById("auth-modal");
 const userBtn = document.getElementById("user-btn");
+const userArea = document.getElementById("user-area");
 const adminLinkBelow = document.getElementById("admin-link-below");
 const accountPanel = document.getElementById("account-panel");
 let currentTab = "login";
@@ -705,8 +708,7 @@ else { document.addEventListener("DOMContentLoaded", setupAuth); }
 loadPrices();
 
 document.querySelector(".basket-checkout")?.addEventListener("click", () => {
-  basketSidebar.classList.remove("is-open");
-  document.body.style.overflow = "";
+  closeBasket();
   const orderEl = document.getElementById("order");
   if (orderEl) setTimeout(() => orderEl.scrollIntoView({ behavior: "smooth" }), 250);
 });
