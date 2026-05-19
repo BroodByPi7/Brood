@@ -551,37 +551,97 @@ function resetAfterOrder() {
 
 const orderForm = document.querySelector(".order-form");
 const orderSubmitBtn = orderForm?.querySelector(".order-submit");
+function validateOrder() {
+  const name = document.getElementById("order-name").value.trim();
+  const contact = document.getElementById("order-contact").value.trim();
+  const date = pickupDate ? pickupDate.value : "";
+  const slot = document.querySelector(".slot-btn.is-selected");
+  const time = slot ? slot.dataset.time : "";
+  const warnName = document.getElementById("warn-name");
+  const warnContact = document.getElementById("warn-contact");
+  const warnDate = document.getElementById("warn-date");
+  const warnSlot = document.getElementById("warn-slot");
+
+  [warnName, warnContact, warnDate, warnSlot].forEach((el) => { if (el) el.textContent = ""; });
+
+  const checks = [
+    { ok: !!name, warn: warnName, msg: "Enter your name", focus: document.getElementById("order-name") },
+    { ok: !!contact, warn: warnContact, msg: "Enter an email or phone", focus: document.getElementById("order-contact") },
+    { ok: !!date, warn: warnDate, msg: "Pick a date", focus: document.getElementById("calendar-widget") },
+    { ok: !!time, warn: warnSlot, msg: "Pick a time slot", focus: slot || document.querySelector(".slot-btn") },
+  ];
+
+  let firstEl = null;
+  let valid = true;
+  for (const c of checks) {
+    if (!c.ok) {
+      if (c.warn && !c.warn.textContent) c.warn.textContent = c.msg;
+      if (!firstEl && c.focus) firstEl = c.focus;
+      valid = false;
+    }
+  }
+
+  if (basket.length === 0) {
+    alert("Your basket is empty. Add items from the menu first.");
+    valid = false;
+  }
+
+  if (basket.length > 0 && isDateFull(date)) {
+    if (warnDate) { warnDate.textContent = "This date is fully booked"; valid = false; }
+    if (!firstEl) firstEl = document.getElementById("calendar-widget");
+  }
+
+  return { valid, firstEl };
+}
+
+function showLiveWarnings() {
+  const pairs = [
+    { el: document.getElementById("order-name"), warn: document.getElementById("warn-name"), msg: "Enter your name" },
+    { el: document.getElementById("order-contact"), warn: document.getElementById("warn-contact"), msg: "Enter an email or phone" },
+  ];
+  pairs.forEach(({ el, warn, msg }) => {
+    if (!el || !warn) return;
+    warn.textContent = el.value.trim() ? "" : msg;
+    el.addEventListener("input", () => { warn.textContent = el.value.trim() ? "" : msg; });
+  });
+  // Update warnings when calendar date changes
+  const grid = document.querySelector(".cal-grid");
+  if (grid) {
+    grid.addEventListener("click", () => {
+      const w = document.getElementById("warn-date");
+      if (w) w.textContent = pickupDate && pickupDate.value ? "" : "Pick a date";
+    });
+  }
+  // Update slot warning on click
+  const warnSlot = document.getElementById("warn-slot");
+  if (warnSlot) {
+    warnSlot.textContent = document.querySelector(".slot-btn.is-selected") ? "" : "Pick a time slot";
+    document.querySelectorAll(".slot-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        warnSlot.textContent = document.querySelector(".slot-btn.is-selected") ? "" : "Pick a time slot";
+      });
+    });
+  }
+}
+showLiveWarnings();
+
 if (orderForm) {
   orderForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const name = document.getElementById("order-name").value.trim();
-    const contact = document.getElementById("order-contact").value.trim();
     const notes = document.getElementById("order-notes").value.trim();
     const date = pickupDate ? pickupDate.value : "";
     const slot = document.querySelector(".slot-btn.is-selected");
     const time = slot ? slot.dataset.time : "";
-    const warnName = document.getElementById("warn-name");
-    const warnContact = document.getElementById("warn-contact");
-    const warnDate = document.getElementById("warn-date");
-    const warnSlot = document.getElementById("warn-slot");
 
-    // Clear warnings
-    [warnName, warnContact, warnDate, warnSlot].forEach((el) => { if (el) el.textContent = ""; });
-
-    let valid = true;
-
-    if (!name) { if (warnName) { warnName.textContent = "Enter your name"; valid = false; } }
-    if (!contact) { if (warnContact) { warnContact.textContent = "Enter an email or phone"; valid = false; } }
-    if (!date) { if (warnDate) { warnDate.textContent = "Pick a date"; valid = false; } }
-    if (!time) { if (warnSlot) { warnSlot.textContent = "Pick a time slot"; valid = false; } }
-    if (basket.length === 0) { alert("Your basket is empty. Add items from the menu first."); valid = false; }
-
-    if (basket.length > 0 && isDateFull(date)) {
-      if (warnDate) { warnDate.textContent = "This date is fully booked"; valid = false; }
+    const { valid, firstEl } = validateOrder();
+    if (!valid) {
+      if (firstEl) { firstEl.focus(); firstEl.scrollIntoView({ behavior: "smooth", block: "center" }); }
+      return;
     }
 
-    if (!valid) return;
+    const name = document.getElementById("order-name").value.trim();
+    const contact = document.getElementById("order-contact").value.trim();
 
     if (orderSubmitBtn) orderSubmitBtn.disabled = true;
 
