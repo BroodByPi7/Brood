@@ -859,8 +859,6 @@ function setupPickupOrders(user) {
   });
 }
 
-let payingOrderId = null;
-
 function renderPickupOrders(orders) {
   const container = document.getElementById("pickup-orders");
   if (!container) return;
@@ -895,7 +893,6 @@ function renderPickupOrders(orders) {
 
   container.querySelectorAll(".pickup-pay").forEach((btn) => {
     btn.addEventListener("click", () => {
-      payingOrderId = btn.dataset.orderId;
       document.getElementById("qr-modal").classList.add("is-open");
       document.body.style.overflow = "hidden";
     });
@@ -913,16 +910,7 @@ document.addEventListener("click", (e) => {
   }
 });
 
-document.getElementById("qr-confirm")?.addEventListener("click", () => {
-  if (!payingOrderId || typeof updateOrderStatus !== "function") return;
-  updateOrderStatus(payingOrderId, "paid")
-    .then(() => {
-      document.getElementById("qr-modal").classList.remove("is-open");
-      document.body.style.overflow = "";
-      payingOrderId = null;
-    })
-    .catch((err) => alert("Payment failed: " + (err.message || err)));
-});
+
 
 // ── Icon color flip on dark sections ──────────────────────────────────────────
 

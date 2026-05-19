@@ -1695,21 +1695,7 @@ p {
   margin-bottom: 0.75rem;
 }
 
-.qr-confirm {
-  padding: 0.5rem 1.5rem;
-  font-size: 0.9rem;
-  font-weight: 700;
-  font-family: inherit;
-  color: var(--paper);
-  background: var(--green);
-  border: 2px solid var(--green);
-  border-radius: 4px;
-  cursor: pointer;
-}
 
-.qr-confirm:hover {
-  opacity: 0.85;
-}
 
 .pickup-thanks {
   font-weight: 700;
