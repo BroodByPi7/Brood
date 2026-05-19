@@ -155,6 +155,7 @@ function renderBasket() {
     basketCount.textContent = "0";
     if (basketIconCount) basketIconCount.textContent = "0";
     basketToggle.classList.remove("is-visible");
+    renderCalendar();
     return;
   }
 
@@ -188,6 +189,7 @@ function renderBasket() {
   basketCount.textContent = count;
   if (basketIconCount) basketIconCount.textContent = count;
   basketToggle.classList.add("is-visible");
+  renderCalendar();
 
   basketItems.querySelectorAll(".item-minus").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -415,6 +417,16 @@ function isItemSoldOut(date, itemName) {
 }
 
 // ── Calendar with availability ──────────────────────────────────────────────
+
+const preorderItems = [
+  "Cakes", "Pies", "Viennoiseries", "Brownies", "Cookies",
+  "Cinnamon rolls and donuts", "Brioche loafs", "Brioche buns"
+];
+
+function hasPreorderItems() {
+  return basket.some((item) => preorderItems.includes(item.name));
+}
+
 function renderCalendar() {
   if (!calGrid || !calLabel || !pickupDate) return;
   try {
@@ -422,8 +434,8 @@ function renderCalendar() {
     const month = calMonth.getMonth();
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    const minDate = new Date(today);
+    minDate.setDate(minDate.getDate() + (hasPreorderItems() ? 2 : 1));
 
     const first = new Date(year, month, 1);
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -443,7 +455,7 @@ function renderCalendar() {
       const date = new Date(year, month, d);
       const ds = fmtDate(year, month, d);
       let cls = "cal-day";
-      if (date < tomorrow) cls += " is-past";
+      if (date < minDate) cls += " is-past";
       if (date.toDateString() === today.toDateString()) cls += " is-today";
       if (ds === pickupDate.value) cls += " is-selected";
       if (isDateFull(ds)) cls += " is-full";
