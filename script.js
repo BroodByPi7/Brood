@@ -930,9 +930,9 @@ function setupPickupOrders(user) {
 // ── Email notification (EmailJS) ────────────────────────────────────────────
 // Fill in the 3 values below from your EmailJS dashboard:
 const EMAILJS_CONFIG = {
-  serviceId: "service_xxxxx",
-  templateId: "template_xxxxx",
-  publicKey: "your_public_key",
+  serviceId: "service_mjbqmoi",
+  templateId: "template_an6hmn8",
+  publicKey: "1ul7l1SH4OXLWxdda",
 };
 
 const notifiedOrders = new Set();
