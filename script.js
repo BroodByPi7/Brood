@@ -689,7 +689,11 @@ function setupAuth() {
       };
       getUserProfile(user.uid).then((profile) => {
         document.getElementById("account-name").textContent = profile ? profile.name : user.email;
+        if (profile && profile.name) {
+          document.getElementById("order-name").value = profile.name;
+        }
       });
+      document.getElementById("order-contact").value = user.email;
       if (adminLinkBelow && user.email === "broodbypi7@gmail.com") {
         adminLinkBelow.style.display = "";
       } else if (adminLinkBelow) {
@@ -699,6 +703,8 @@ function setupAuth() {
       userBtn.setAttribute("aria-label", "Sign in");
       userBtn.onclick = openAuthModal;
       if (adminLinkBelow) adminLinkBelow.style.display = "none";
+      document.getElementById("order-contact").value = "";
+      document.getElementById("order-name").value = "";
     }
   });
 }
