@@ -534,6 +534,10 @@ function showOrderConfirmation(ref) {
 
 function resetAfterOrder() {
   if (orderSubmitBtn) orderSubmitBtn.disabled = false;
+  ["warn-name","warn-contact","warn-date","warn-slot"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = "";
+  });
   basket.length = 0;
   renderBasket();
   orderForm.reset();
@@ -550,27 +554,36 @@ const orderSubmitBtn = orderForm?.querySelector(".order-submit");
 if (orderForm) {
   orderForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (orderSubmitBtn) orderSubmitBtn.disabled = true;
+
     const name = document.getElementById("order-name").value.trim();
     const contact = document.getElementById("order-contact").value.trim();
     const notes = document.getElementById("order-notes").value.trim();
     const date = pickupDate ? pickupDate.value : "";
     const slot = document.querySelector(".slot-btn.is-selected");
     const time = slot ? slot.dataset.time : "";
+    const warnName = document.getElementById("warn-name");
+    const warnContact = document.getElementById("warn-contact");
+    const warnDate = document.getElementById("warn-date");
+    const warnSlot = document.getElementById("warn-slot");
 
-    if (!name || !contact) { if (orderSubmitBtn) orderSubmitBtn.disabled = false; return; }
+    // Clear warnings
+    [warnName, warnContact, warnDate, warnSlot].forEach((el) => { if (el) el.textContent = ""; });
 
-    if (basket.length === 0) {
-      if (orderSubmitBtn) orderSubmitBtn.disabled = false;
-      alert("Your basket is empty. Add items from the menu first.");
-      return;
+    let valid = true;
+
+    if (!name) { if (warnName) { warnName.textContent = "Enter your name"; valid = false; } }
+    if (!contact) { if (warnContact) { warnContact.textContent = "Enter an email or phone"; valid = false; } }
+    if (!date) { if (warnDate) { warnDate.textContent = "Pick a date"; valid = false; } }
+    if (!time) { if (warnSlot) { warnSlot.textContent = "Pick a time slot"; valid = false; } }
+    if (basket.length === 0) { alert("Your basket is empty. Add items from the menu first."); valid = false; }
+
+    if (basket.length > 0 && isDateFull(date)) {
+      if (warnDate) { warnDate.textContent = "This date is fully booked"; valid = false; }
     }
 
-    if (isDateFull(date)) {
-      if (orderSubmitBtn) orderSubmitBtn.disabled = false;
-      alert("Sorry, this date is fully booked. Please choose another date.");
-      return;
-    }
+    if (!valid) return;
+
+    if (orderSubmitBtn) orderSubmitBtn.disabled = true;
 
     for (const item of basket) {
       if (isItemSoldOut(date, item.name)) {

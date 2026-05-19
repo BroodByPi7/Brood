@@ -256,6 +256,7 @@
           </div>
           <input type="hidden" id="pickup-date" name="pickup-date">
           <p class="order-cutoff">Orders placed after 6pm are confirmed for the day after next.</p>
+          <span class="order-warn" id="warn-date"></span>
         </div>
         <div class="order-slots">
           <p class="order-slots-label">Pickup time</p>
@@ -267,13 +268,20 @@
             <button class="slot-btn" type="button" data-time="12:00-13:00">12–1 PM</button>
             <button class="slot-btn" type="button" data-time="13:00-14:00">1–2 PM</button>
           </div>
+          <span class="order-warn" id="warn-slot"></span>
         </div>
       </div>
 
       <form class="order-form" novalidate>
         <div class="order-form-row">
-          <input type="text" id="order-name" placeholder="Your name" required>
-          <input type="text" id="order-contact" placeholder="Email or phone" required>
+          <div class="order-field">
+            <input type="text" id="order-name" placeholder="Your name" required>
+            <span class="order-warn" id="warn-name"></span>
+          </div>
+          <div class="order-field">
+            <input type="text" id="order-contact" placeholder="Email or phone" required>
+            <span class="order-warn" id="warn-contact"></span>
+          </div>
         </div>
         <textarea id="order-notes" rows="3" placeholder="Order notes or special requests (optional)"></textarea>
         <div class="order-form-foot">

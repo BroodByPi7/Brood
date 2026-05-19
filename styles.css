@@ -1047,6 +1047,20 @@ p {
   color: var(--brood-blue);
 }
 
+.order-warn {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #c42b2b;
+  min-height: 1.2rem;
+  margin-top: 0.2rem;
+}
+
+.order-field {
+  display: grid;
+  gap: 0;
+}
+
 .basket-checkout {
   width: 100%;
   padding: 0.85rem;
