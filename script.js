@@ -694,12 +694,7 @@ function setupAuth() {
       }
     } else {
       userBtn.setAttribute("aria-label", "Sign in");
-userBtn.onclick = openAuthModal;
-
-document.querySelector(".basket-checkout")?.addEventListener("click", () => {
-  closeBasket();
-  document.getElementById("order")?.scrollIntoView({ behavior: "smooth" });
-});
+      userBtn.onclick = openAuthModal;
       if (adminLinkBelow) adminLinkBelow.style.display = "none";
     }
   });
@@ -708,6 +703,11 @@ if (typeof onAuthChanged === "function") { setupAuth(); }
 else { document.addEventListener("DOMContentLoaded", setupAuth); }
 
 loadPrices();
+
+document.querySelector(".basket-checkout")?.addEventListener("click", () => {
+  closeBasket();
+  document.getElementById("order")?.scrollIntoView({ behavior: "smooth" });
+});
 
 accountPanel.querySelector(".account-backdrop").addEventListener("click", () => {
   accountPanel.classList.remove("is-open");
